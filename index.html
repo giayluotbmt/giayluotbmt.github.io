@@ -463,12 +463,12 @@
       </div>
       <p class="text-[11px] text-slate-400">Sau khi chuyển khoản phí 10%, bạn có thể chọn xóa luôn tin khỏi sàn.</p>
       <div class="flex flex-col gap-2 pt-1 text-xs">
-        <button onclick="finishSoldProcess(true)" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold transition">
+        <button id="btnConfirmSoldAndDelete" onclick="finishSoldProcess(true)" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold transition">
           <i class="fa-solid fa-check-double mr-1"></i> Đã Chuyển Phí & Xóa Tin Khỏi Sàn
         </button>
         <div class="flex gap-2">
           <button onclick="closeVietQrModal()" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold">Đóng</button>
-          <button onclick="finishSoldProcess(false)" class="flex-1 py-2 rounded-xl bg-slate-800 border border-emerald-500/40 text-emerald-300 font-bold">Chỉ Đánh Dấu Đã Bán</button>
+          <button id="btnConfirmSoldOnly" onclick="finishSoldProcess(false)" class="flex-1 py-2 rounded-xl bg-slate-800 border border-emerald-500/40 text-emerald-300 font-bold">Chỉ Đánh Dấu Đã Bán</button>
         </div>
       </div>
     </div>
@@ -959,7 +959,7 @@
       }
     }
 
-    async function postToCloud(payload) {
+    async function postToCloud(payload, skipAutoSync = false) {
       const urlToUse = (currentScriptUrl && currentScriptUrl.startsWith('https://'))
         ? currentScriptUrl.trim()
         : DEFAULT_SCRIPT_URL;
@@ -978,7 +978,9 @@
             body: jsonStr
           });
         }
-        setTimeout(() => syncWithCloud(false), 1800);
+        if (!skipAutoSync) {
+          setTimeout(() => syncWithCloud(false), 1800);
+        }
       } catch (e) {
         console.error("POST cloud error", e);
         setCloudStatus('err', 'Lỗi gửi dữ liệu');
@@ -1387,41 +1389,67 @@
       if (!p) return;
       const targetId = String(p.id);
       const buyer = p.buyerPhone || '';
+      const seller = p.sellerPhone || '';
+      const productName = p.title || '';
+      const price = p.price || 0;
 
-      if (deleteAfterSold) {
-        if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
-        products = products.filter(x => String(x.id) !== targetId);
-      } else {
-        p.status = 'sold';
+      const btnDel = document.getElementById('btnConfirmSoldAndDelete');
+      const btnOnly = document.getElementById('btnConfirmSoldOnly');
+      if (btnDel) {
+        btnDel.disabled = true;
+        if (deleteAfterSold) btnDel.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang gửi mail & xóa tin...';
       }
+      if (btnOnly) btnOnly.disabled = true;
 
-      saveLocalCache();
-      closeVietQrModal();
-      closeDetailModal();
-      renderMarket();
-      renderMyShoes();
+      try {
+        if (deleteAfterSold) {
+          if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
+          products = products.filter(x => String(x.id) !== targetId);
+        } else {
+          p.status = 'sold';
+        }
 
-      await postToCloud({
-        action: 'UPDATE_STATUS',
-        productId: targetId,
-        newStatus: 'sold',
-        buyerPhone: buyer
-      });
+        saveLocalCache();
+        renderMarket();
+        renderMyShoes();
 
-      if (deleteAfterSold) {
-        setTimeout(async () => {
+        // Bước 1: Gửi 'sold' trước và chờ Apps Script xử lý xong việc gửi mail xác nhận
+        await postToCloud({
+          action: 'UPDATE_STATUS',
+          productId: targetId,
+          newStatus: 'sold',
+          buyerPhone: buyer,
+          sellerPhone: seller,
+          productName: productName,
+          price: price
+        }, deleteAfterSold);
+
+        // Bước 2: Nếu chọn xóa luôn khỏi sàn, chờ 4 giây cho Apps Script gửi xong mail rồi mới gửi 'deleted'
+        if (deleteAfterSold) {
+          await new Promise(resolve => setTimeout(resolve, 4000));
           await postToCloud({
             action: 'UPDATE_STATUS',
             productId: targetId,
             newStatus: 'deleted',
-            buyerPhone: buyer
+            buyerPhone: buyer,
+            sellerPhone: seller,
+            productName: productName,
+            price: price
           });
-        }, 1200);
-      }
+        }
 
-      alert(deleteAfterSold
-        ? 'Đã xác nhận chốt bán, gửi báo cáo về mail Admin và xóa tin khỏi sàn!'
-        : 'Đã cập nhật trạng thái: Đã bán.');
+        closeVietQrModal();
+        closeDetailModal();
+        alert(deleteAfterSold
+          ? 'Đã xác nhận chốt bán, gửi báo cáo về mail Admin và xóa tin khỏi sàn!'
+          : 'Đã cập nhật trạng thái: Đã bán.');
+      } finally {
+        if (btnDel) {
+          btnDel.disabled = false;
+          btnDel.innerHTML = '<i class="fa-solid fa-check-double mr-1"></i> Đã Chuyển Phí & Xóa Tin Khỏi Sàn';
+        }
+        if (btnOnly) btnOnly.disabled = false;
+      }
     }
 
     async function triggerDeleteProduct() {
