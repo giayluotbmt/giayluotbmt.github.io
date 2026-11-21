@@ -105,7 +105,7 @@
           <div class="relative flex-grow">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input id="searchInput" oninput="renderMarket()" type="text"
-              placeholder="Tìm tên giày, thương hiệu (Mizuno, Nike, Adidas, Puma...)..."
+              placeholder="Tìm tên giày, hãng, phường/xã hoặc địa danh (BMT, Ea Kar, Tân An...)"
               class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-500 transition" />
           </div>
 
@@ -141,15 +141,23 @@
           <button id="sizeBtn-43" onclick="setSizeFilter('43')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">43</button>
           <button id="sizeBtn-44" onclick="setSizeFilter('44')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">44</button>
         </div>
+
+        <!-- DYNAMIC LOCATION FILTER BAR (AUTO-BUILT FROM ACTIVE LISTINGS) -->
+        <div id="dynamicLocationBar" class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs"></div>
       </div>
 
       <div id="emptyState" class="hidden text-center py-12 bg-slate-900 rounded-2xl border border-slate-800 space-y-2.5">
         <i class="fa-solid fa-box-open text-3xl text-slate-500"></i>
-        <p class="text-sm font-bold text-slate-200">Chưa có đôi giày nào trên sàn</p>
-        <p class="text-xs text-slate-400">Chưa có sản phẩm nào khớp bộ lọc hoặc hệ thống đang cập nhật. Hãy là người đầu tiên đăng pass giày!</p>
-        <button onclick="openPostTabGuarded()" class="mt-1 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-extrabold transition">
-          <i class="fa-solid fa-plus-circle mr-1"></i> Đăng Pass Giày Ngay
-        </button>
+        <p class="text-sm font-bold text-slate-200">Chưa có đôi giày nào khớp bộ lọc</p>
+        <p class="text-xs text-slate-400">Thử đổi khu vực/size hoặc đăng pass giày mới lên sàn ngay!</p>
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <button onclick="resetAllFilters()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition">
+            Xóa bộ lọc
+          </button>
+          <button onclick="openPostTabGuarded()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-extrabold transition">
+            <i class="fa-solid fa-plus-circle mr-1"></i> Đăng Pass Giày Ngay
+          </button>
+        </div>
       </div>
 
       <div id="marketGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
@@ -217,7 +225,8 @@
             <div>
               <label class="block text-slate-300 font-bold mb-1">Khu vực giao dịch *</label>
               <input id="postLocation" required type="text" value="Buôn Ma Thuột"
-                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500" />
+                placeholder="VD: Buôn Ma Thuột, Tân An, Ea Kar..."
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
 
             <div>
@@ -546,9 +555,43 @@
 
     let selectedCategory = "ALL";
     let selectedSize = "ALL";
+    let selectedLocationNorm = "ALL";
 
     let currentDetailId = null;
     let timerInterval = null;
+
+    function normalizeAreaText(text) {
+      return String(text || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getCanonicalLocationKey(rawLoc) {
+      const norm = normalizeAreaText(rawLoc);
+      if (!norm) return "";
+      if (norm === "bmt" || norm.includes("buon ma thuot")) return "buon ma thuot";
+      return norm;
+    }
+
+    function getCanonicalLocationLabel(rawLoc) {
+      const key = getCanonicalLocationKey(rawLoc);
+      if (key === "buon ma thuot") return "Buôn Ma Thuột";
+      return String(rawLoc || "").trim();
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
     function extractBlacklistPhone(entry) {
       if (!entry) return "";
@@ -975,30 +1018,95 @@
       renderMarket();
     }
 
+    function setLocationFilter(locNorm) {
+      selectedLocationNorm = locNorm;
+      renderMarket();
+    }
+
+    function renderDynamicLocationBar(baseProducts) {
+      const bar = document.getElementById('dynamicLocationBar');
+      if (!bar) return;
+
+      const areaMap = new Map();
+      baseProducts.forEach(p => {
+        const key = getCanonicalLocationKey(p.location);
+        if (!key) return;
+        if (!areaMap.has(key)) {
+          areaMap.set(key, { key, label: getCanonicalLocationLabel(p.location), count: 1 });
+        } else {
+          areaMap.get(key).count += 1;
+        }
+      });
+
+      if (selectedLocationNorm !== 'ALL' && !areaMap.has(selectedLocationNorm)) {
+        selectedLocationNorm = 'ALL';
+      }
+
+      const items = Array.from(areaMap.values());
+      if (items.length === 0) {
+        bar.innerHTML = '';
+        bar.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      const allActive = selectedLocationNorm === 'ALL';
+      let html = `<span class="text-[11px] font-bold text-slate-400 uppercase mr-1 whitespace-nowrap">KHU VỰC:</span>`;
+      html += `<button onclick="setLocationFilter('ALL')" class="px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap transition ${
+        allActive
+          ? 'bg-orange-500 text-white font-bold'
+          : 'bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold'
+      }">Tất cả (${baseProducts.length})</button>`;
+
+      items.forEach(item => {
+        const isAct = selectedLocationNorm === item.key;
+        const safeKey = item.key.replace(/'/g, "\\'");
+        html += `<button onclick="setLocationFilter('${safeKey}')" class="px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap transition ${
+          isAct
+            ? 'bg-orange-500 text-white font-bold'
+            : 'bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold'
+        }">📍 ${escapeHtml(item.label)} (${item.count})</button>`;
+      });
+
+      bar.innerHTML = html;
+    }
+
+    function resetAllFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'ALL';
+      selectedCategory = 'ALL';
+      selectedSize = 'ALL';
+      selectedLocationNorm = 'ALL';
+      setCategoryFilter('ALL');
+      setSizeFilter('ALL');
+    }
+
     function renderMarket() {
       const grid = document.getElementById('marketGrid');
       const emptyState = document.getElementById('emptyState');
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const search = normalizeAreaText(document.getElementById('searchInput').value);
       const statusFilter = document.getElementById('statusFilter').value;
       const deletedSet = new Set(deletedProductIds.map(id => String(id)));
 
-      const visibleProducts = products.filter(p => {
+      const statusBaseProducts = products.filter(p => {
         if (p.status === 'banned' || p.status === 'deleted' || deletedSet.has(String(p.id))) return false;
         if (isPhoneBanned(p.sellerPhone)) return false;
         if (statusFilter === 'ALL' && p.status === 'sold') return false;
         if (statusFilter === 'available' && p.status !== 'available') return false;
         if (statusFilter === 'negotiating' && p.status !== 'negotiating') return false;
         if (statusFilter === 'sold' && p.status !== 'sold') return false;
+        return true;
+      });
 
-        if (
-          search &&
-          !p.title.toLowerCase().includes(search) &&
-          !p.category.toLowerCase().includes(search) &&
-          !p.location.toLowerCase().includes(search)
-        ) return false;
+      renderDynamicLocationBar(statusBaseProducts);
+
+      const visibleProducts = statusBaseProducts.filter(p => {
+        const searchableBlob = normalizeAreaText(`${p.title} ${p.category} ${p.location} ${p.condition} ${p.description}`);
+        if (search && !searchableBlob.includes(search)) return false;
 
         if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
         if (selectedSize !== 'ALL' && String(p.size).replace(/\D/g, '') !== String(selectedSize)) return false;
+        if (selectedLocationNorm !== 'ALL' && getCanonicalLocationKey(p.location) !== selectedLocationNorm) return false;
         return true;
       });
 
@@ -1021,15 +1129,15 @@
         return `
           <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
             <div class="relative w-full h-48 bg-slate-800 overflow-hidden">
-              <img src="${img}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              <img src="${img}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
               <div class="absolute top-2.5 left-2.5">${statusBadge}</div>
-              <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-950/90 border border-slate-700 text-white">EU ${p.size}</span>
+              <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-950/90 border border-slate-700 text-white">EU ${escapeHtml(p.size)}</span>
             </div>
             <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
               <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">${p.category}</p>
-                <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${p.title}</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${p.location} • ${p.condition}</p>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">${escapeHtml(p.category)}</p>
+                <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${escapeHtml(p.location)} • ${escapeHtml(p.condition)}</p>
               </div>
               <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between">
                 <div>
@@ -1412,6 +1520,7 @@
 
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Đăng Pass Lên Sàn'; }
       document.getElementById('postForm').reset();
+      document.getElementById('postLocation').value = "Buôn Ma Thuột";
       tempPhoto1 = ""; tempPhoto2 = "";
       document.getElementById('prevPhoto1').classList.add('hidden');
       document.getElementById('placeholder1').classList.remove('hidden');
@@ -1565,7 +1674,7 @@
                 <i class="fa-solid fa-bell"></i>
               </div>
               <div>
-                <p class="font-extrabold text-slate-100">${a.category} • Size <span class="text-orange-400 font-black">${a.size}</span></p>
+                <p class="font-extrabold text-slate-100">${escapeHtml(a.category)} • Size <span class="text-orange-400 font-black">${escapeHtml(a.size)}</span></p>
                 <p class="text-[11px] text-slate-400">SĐT: ${displayPhone} • ${formatShortDate(a.createdAt)}</p>
               </div>
             </div>
@@ -1604,7 +1713,7 @@
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isMyPost ? 'bg-orange-500/20 text-orange-300' : 'bg-sky-500/20 text-sky-300'}">${isMyPost ? 'Tin của tôi' : 'Đang giữ chỗ'}</span>
                 <span class="text-[11px] font-semibold text-slate-400">${p.status}</span>
               </div>
-              <h4 class="font-extrabold text-white line-clamp-1">${p.title}</h4>
+              <h4 class="font-extrabold text-white line-clamp-1">${escapeHtml(p.title)}</h4>
               <p class="text-orange-400 font-black">${formatVND(p.price)}</p>
             </div>
           </div>
@@ -1689,10 +1798,10 @@
         : logs.map(l => `
             <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 text-[11px] space-y-1">
               <div class="flex items-center justify-between font-bold text-slate-100">
-                <span>Mã: ${l.productId || ''}</span>
+                <span>Mã: ${escapeHtml(l.productId || '')}</span>
                 <span class="text-orange-400">${formatVND(l.commission)} (10%)</span>
               </div>
-              <p class="text-slate-400">Người mua: ${l.buyerPhone || ''} • Người bán: ${l.sellerPhone || ''}</p>
+              <p class="text-slate-400">Người mua: ${escapeHtml(l.buyerPhone || '')} • Người bán: ${escapeHtml(l.sellerPhone || '')}</p>
             </div>
           `).join('');
     }
