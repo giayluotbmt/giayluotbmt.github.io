@@ -999,6 +999,7 @@
 
     window.onload = function() {
       if (activePhone) {
+        activePhone = normalizePhone(activePhone);
         document.getElementById('userPhoneInput').value = activePhone;
         if (!isAdminSession()) {
           document.getElementById('postSellerPhone').value = activePhone;
@@ -1026,6 +1027,9 @@
       if (digits === ADMIN_CODE) return ADMIN_CODE;
       if (digits.startsWith("84") && digits.length === 11) {
         digits = "0" + digits.slice(2);
+      }
+      if (digits.length === 9 && /^[35789]/.test(digits)) {
+        digits = "0" + digits;
       }
       return digits;
     }
