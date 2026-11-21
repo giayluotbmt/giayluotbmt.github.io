@@ -572,6 +572,21 @@
         .trim();
     }
 
+    function expandSearchQuery(normalizedQuery) {
+      if (!normalizedQuery) return [];
+      const q = normalizedQuery.trim();
+      const compact = q.replace(/\s+/g, '');
+      const variants = new Set([q, compact]);
+
+      if (compact === 'bmt' || q.includes('buon ma thuot') || compact.includes('buonmathuot')) {
+        variants.add('bmt');
+        variants.add('buon ma thuot');
+        variants.add('buonmathuot');
+      }
+
+      return Array.from(variants).filter(Boolean);
+    }
+
     function getCanonicalLocationKey(rawLoc) {
       const compact = normalizeAreaText(rawLoc).replace(/\s+/g, '');
       if (!compact) return "";
@@ -1090,7 +1105,7 @@
       const grid = document.getElementById('marketGrid');
       const emptyState = document.getElementById('emptyState');
       const search = normalizeAreaText(document.getElementById('searchInput').value);
-      const compactSearch = search.replace(/\s+/g, '');
+      const searchVariants = expandSearchQuery(search);
       const statusFilter = document.getElementById('statusFilter').value;
       const deletedSet = new Set(deletedProductIds.map(id => String(id)));
 
@@ -1109,7 +1124,10 @@
       const visibleProducts = statusBaseProducts.filter(p => {
         const searchableBlob = normalizeAreaText(`${p.title} ${p.category} ${p.location} ${p.condition} ${p.description}`);
         const compactBlob = searchableBlob.replace(/\s+/g, '');
-        if (search && !searchableBlob.includes(search) && !compactBlob.includes(compactSearch)) return false;
+        if (searchVariants.length > 0) {
+          const matched = searchVariants.some(v => searchableBlob.includes(v) || compactBlob.includes(v.replace(/\s+/g, '')));
+          if (!matched) return false;
+        }
 
         if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
         if (selectedSize !== 'ALL' && String(p.size).replace(/\D/g, '') !== String(selectedSize)) return false;
