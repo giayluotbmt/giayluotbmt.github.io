@@ -268,7 +268,7 @@
       <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg flex items-center justify-between gap-3">
         <div>
           <h2 class="text-sm font-extrabold text-white">SĂN SIZE GIÀY THEO YÊU CẦU</h2>
-          <p class="text-xs text-slate-400">Lưu môn & size bạn cần để dễ theo dõi khi có kèo mới (SĐT được ẩn bảo mật).</p>
+          <p class="text-xs text-slate-400">Tin săn size ẩn hoàn toàn với người khác — chỉ chủ số hoặc quản trị mới thấy.</p>
         </div>
         <button onclick="openAddAlertModal()"
           class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap transition">
@@ -502,6 +502,7 @@
 
   <script>
     const ADMIN_CODE = "204201504042019";
+    const ADMIN_OPERATOR_PHONE = "0909215078";
     const SHB_ACCOUNT = "7772345999";
     const SHB_NAME = "NGUYEN UNG";
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
@@ -514,7 +515,7 @@
 
     let products = [];
     let alerts = [];
-    let deletedAlertIds = [];
+    let deletedAlertKeys = [];
     let blacklist = [];
     let logs = [];
 
@@ -528,7 +529,8 @@
     let timerInterval = null;
 
     function isAdminSession() {
-      return String(activePhone || "").replace(/\D/g, "") === ADMIN_CODE;
+      const clean = String(activePhone || "").replace(/\D/g, "");
+      return clean === ADMIN_CODE || normalizePhone(clean) === ADMIN_OPERATOR_PHONE;
     }
 
     function isPhoneBanned(phone) {
@@ -542,6 +544,10 @@
       const inputVal = normalizePhone(document.getElementById('userPhoneInput')?.value || "");
       if (inputVal) return inputVal;
       return normalizePhone(activePhone || "");
+    }
+
+    function getAlertKey(a) {
+      return `${normalizePhone(a.phone)}|${String(a.category || '').trim()}|${String(a.size || '').trim()}`;
     }
 
     function maskPhoneNumber(phone) {
@@ -652,8 +658,8 @@
         if (cachedProd) products = JSON.parse(cachedProd);
         const cachedAlerts = localStorage.getItem('giayluot_cache_alerts');
         if (cachedAlerts) alerts = JSON.parse(cachedAlerts);
-        const cachedDeletedAlerts = localStorage.getItem('giayluot_deleted_alert_ids');
-        if (cachedDeletedAlerts) deletedAlertIds = JSON.parse(cachedDeletedAlerts);
+        const cachedDeletedKeys = localStorage.getItem('giayluot_deleted_alert_keys');
+        if (cachedDeletedKeys) deletedAlertKeys = JSON.parse(cachedDeletedKeys);
         const cachedBlack = localStorage.getItem('giayluot_cache_blacklist');
         if (cachedBlack) blacklist = JSON.parse(cachedBlack);
       } catch (e) {
@@ -664,7 +670,7 @@
     function saveLocalCache() {
       localStorage.setItem('giayluot_cache_products', JSON.stringify(products));
       localStorage.setItem('giayluot_cache_alerts', JSON.stringify(alerts));
-      localStorage.setItem('giayluot_deleted_alert_ids', JSON.stringify(deletedAlertIds));
+      localStorage.setItem('giayluot_deleted_alert_keys', JSON.stringify(deletedAlertKeys));
       localStorage.setItem('giayluot_cache_blacklist', JSON.stringify(blacklist));
     }
 
@@ -761,16 +767,21 @@
           }
 
           if (Array.isArray(data.alerts)) {
-            const deletedSet = new Set(deletedAlertIds.map(String));
+            const deletedSet = new Set(deletedAlertKeys);
             alerts = data.alerts
-              .map((a, idx) => ({
-                id: String(a.id || `ALT-REMOTE-${idx}-${normalizePhone(a.phone)}-${a.category}-${a.size}`),
-                phone: normalizePhone(a.phone),
-                category: String(a.category || 'Bóng đá'),
-                size: String(a.size || ''),
-                createdAt: a.createdAt || ''
-              }))
-              .filter(a => !deletedSet.has(String(a.id)));
+              .map((a, idx) => {
+                const phoneNorm = normalizePhone(a.phone);
+                const cat = String(a.category || 'Bóng đá').trim();
+                const sz = String(a.size || '').trim();
+                return {
+                  id: String(a.id || `ALT-REMOTE-${idx}-${phoneNorm}-${cat}-${sz}`),
+                  phone: phoneNorm,
+                  category: cat,
+                  size: sz,
+                  createdAt: a.createdAt || ''
+                };
+              })
+              .filter(a => !deletedSet.has(getAlertKey(a)));
           }
 
           if (Array.isArray(data.logs)) logs = data.logs;
@@ -1324,43 +1335,64 @@
         return;
       }
       const alertId = "ALT-" + Date.now();
-      deletedAlertIds = deletedAlertIds.filter(id => String(id) !== alertId);
       const newAlert = { id: alertId, phone, category: cat, size, createdAt: new Date().toLocaleDateString('vi-VN') };
+      const key = getAlertKey(newAlert);
+      deletedAlertKeys = deletedAlertKeys.filter(k => k !== key);
       alerts.unshift(newAlert);
       saveLocalCache();
       closeAddAlertModal();
       renderAlerts();
       await postToCloud({ action: 'ADD_ALERT', id: alertId, phone, category: cat, size });
-      alert('Đã lưu yêu cầu săn size!');
+      alert('Đã lưu yêu cầu săn size (ẩn hoàn toàn với người khác)!');
     }
 
-    async function deleteAlert(id) {
-      const target = alerts.find(a => String(a.id) === String(id));
-      alerts = alerts.filter(a => String(a.id) !== String(id));
-      if (!deletedAlertIds.includes(String(id))) {
-        deletedAlertIds.push(String(id));
+    async function deleteAlertByIndex(idx) {
+      const visible = getVisibleAlerts();
+      const target = visible[idx];
+      if (!target) return;
+
+      const targetKey = getAlertKey(target);
+      alerts = alerts.filter(a => String(a.id) !== String(target.id) && getAlertKey(a) !== targetKey);
+      if (!deletedAlertKeys.includes(targetKey)) {
+        deletedAlertKeys.push(targetKey);
       }
       saveLocalCache();
       renderAlerts();
       await postToCloud({
         action: 'DELETE_ALERT',
-        id: String(id),
-        phone: target ? normalizePhone(target.phone) : '',
-        category: target ? target.category : '',
-        size: target ? target.size : ''
+        id: String(target.id || ''),
+        phone: normalizePhone(target.phone),
+        category: target.category || '',
+        size: target.size || ''
       });
+    }
+
+    function getVisibleAlerts() {
+      const isAdmin = isAdminSession();
+      const viewerNorm = getCurrentViewerPhone();
+      if (isAdmin) return alerts;
+      if (!viewerNorm) return [];
+      return alerts.filter(a => normalizePhone(a.phone) === viewerNorm);
     }
 
     function renderAlerts() {
       const list = document.getElementById('alertsList');
       const isAdmin = isAdminSession();
       const viewerNorm = getCurrentViewerPhone();
-      document.getElementById('badgeAlertsCount').innerText = alerts.length;
-      if (alerts.length === 0) {
+      const visible = getVisibleAlerts();
+      document.getElementById('badgeAlertsCount').innerText = visible.length;
+
+      if (!viewerNorm && !isAdmin) {
+        list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Tin săn size được ẩn bảo mật với người khác. Nhập SĐT của bạn ở ô trên cùng để xem và quản lý tin săn size của riêng bạn.</div>`;
+        return;
+      }
+
+      if (visible.length === 0) {
         list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Chưa có yêu cầu săn size nào. Bấm "Đăng ký săn size" để tạo mới.</div>`;
         return;
       }
-      list.innerHTML = alerts.map(a => {
+
+      list.innerHTML = visible.map((a, idx) => {
         const phoneNorm = normalizePhone(a.phone);
         const canDelete = isAdmin || (viewerNorm && phoneNorm && viewerNorm === phoneNorm);
         const displayPhone = isAdmin ? (phoneNorm || 'Đang ẩn') : maskPhoneNumber(phoneNorm);
@@ -1375,7 +1407,7 @@
                 <p class="text-[11px] text-slate-400">SĐT: ${displayPhone} • ${formatShortDate(a.createdAt)}</p>
               </div>
             </div>
-            ${canDelete ? `<button onclick="deleteAlert('${a.id}')" title="Xóa săn size" class="p-2 text-slate-400 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-[10px] text-slate-500">Bảo mật</span>`}
+            ${canDelete ? `<button onclick="deleteAlertByIndex(${idx})" title="Xóa săn size" class="px-2.5 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 hover:bg-rose-600 hover:text-white font-bold transition"><i class="fa-solid fa-trash-can mr-1"></i>Xóa</button>` : `<span class="text-[10px] text-slate-500">Bảo mật</span>`}
           </div>
         `;
       }).join('');
