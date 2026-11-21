@@ -927,7 +927,6 @@
       const viewerNorm = getCurrentViewerPhone();
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
-      const isCurrentBuyer = Boolean(viewerNorm && !isAdmin && p.buyerPhone && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
 
       document.getElementById('modalCat').innerText = p.category;
@@ -979,7 +978,7 @@
       const reserveBtn = document.getElementById('btnReserveAction');
       if (isReserved && p.lockedUntil) {
         timerBox.classList.remove('hidden');
-        document.getElementById('modalBuyerPhone').innerText = (isCurrentBuyer || isAdmin || isSeller)
+        document.getElementById('modalBuyerPhone').innerText = isAdmin
           ? (p.buyerPhone || 'Đang ẩn')
           : maskPhoneNumber(p.buyerPhone);
         reserveBtn.classList.add('hidden');
@@ -1324,7 +1323,7 @@
             </div>
             <div>
               <p class="font-extrabold text-slate-100">${a.category} • Size <span class="text-orange-400 font-black">${a.size}</span></p>
-              <p class="text-[11px] text-slate-400">SĐT: ${a.phone} • ${a.createdAt || ''}</p>
+              <p class="text-[11px] text-slate-400">SĐT: ${maskPhoneNumber(a.phone)} • ${a.createdAt || ''}</p>
             </div>
           </div>
           <button onclick="deleteAlert('${a.id}')" class="p-2 text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
