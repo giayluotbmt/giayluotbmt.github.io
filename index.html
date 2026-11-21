@@ -160,7 +160,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-extrabold text-white">ĐĂNG PASS GIÀY LƯỚT</h2>
-            <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
+            <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • SĐT người bán được bảo mật ẩn công khai • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
           </div>
           <a href="tel:0906075077" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-orange-400 hover:bg-slate-700">
             <i class="fa-solid fa-phone mr-1"></i>Hỗ trợ
@@ -220,7 +220,7 @@
             </div>
 
             <div>
-              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán *</label>
+              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán (được ẩn bảo mật) *</label>
               <input id="postSellerPhone" required type="tel" placeholder="09xxxxxxxx"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
@@ -503,6 +503,7 @@
   <script>
     const ADMIN_CODE = "204201504042019";
     const ALERT_OWNER_OVERRIDE_PHONE = "0909215078";
+    const ADMIN_CONTACT_PHONE = "0906075077";
     const SHB_ACCOUNT = "7772345999";
     const SHB_NAME = "NGUYEN UNG";
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
@@ -558,7 +559,7 @@
 
     function maskPhoneNumber(phone) {
       const clean = normalizePhone(phone) || String(phone || "").replace(/\D/g, "");
-      if (!clean) return "Đang ẩn";
+      if (!clean) return "Đã ẩn bảo mật";
       if (clean.length <= 6) return clean.slice(0, 2) + "***" + clean.slice(-1);
       return clean.slice(0, 4) + "***" + clean.slice(-3);
     }
@@ -645,6 +646,9 @@
       renderMarket();
       renderMyShoes();
       renderAlerts();
+      if (currentDetailId && !document.getElementById('detailModal').classList.contains('hidden')) {
+        openDetailModal(currentDetailId);
+      }
     }
 
     function savePhoneFromInput() {
@@ -974,6 +978,7 @@
       const viewerNorm = getCurrentViewerPhone();
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
+      const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
 
       document.getElementById('modalCat').innerText = p.category;
@@ -982,7 +987,8 @@
       document.getElementById('modalSize').innerText = p.size;
       document.getElementById('modalCond').innerText = p.condition;
       document.getElementById('modalLoc').innerText = p.location;
-      document.getElementById('modalSeller').innerText = (isSeller || isAdmin || !isReserved)
+      // Bảo mật SĐT người bán: chỉ hiện đầy đủ cho chủ tin hoặc Admin; người ngoài/người mua luôn thấy dạng ẩn bảo mật
+      document.getElementById('modalSeller').innerText = (isSeller || isAdmin)
         ? (p.sellerPhone || 'Chưa có SĐT')
         : maskPhoneNumber(p.sellerPhone);
       document.getElementById('modalNote').innerText = p.description ? `Ghi chú: ${p.description}` : 'Không có ghi chú thêm.';
@@ -1001,7 +1007,8 @@
 
       const callBtn = document.getElementById('btnCallSeller');
       const zaloBtn = document.getElementById('btnZaloSeller');
-      const canContactSeller = !isReserved || isSeller || isAdmin;
+      // Cho phép người đang giữ chỗ (isCurrentBuyer), chủ tin (isSeller), hoặc Admin gọi/Zalo khi giữ chỗ; khóa người thứ 3
+      const canContactSeller = !isReserved || isCurrentBuyer || isSeller || isAdmin;
 
       if (canContactSeller) {
         callBtn.classList.remove('opacity-40', 'cursor-not-allowed');
@@ -1025,7 +1032,7 @@
       const reserveBtn = document.getElementById('btnReserveAction');
       if (isReserved && p.lockedUntil) {
         timerBox.classList.remove('hidden');
-        document.getElementById('modalBuyerPhone').innerText = isAdmin
+        document.getElementById('modalBuyerPhone').innerText = (isAdmin || isCurrentBuyer || isSeller)
           ? (p.buyerPhone || 'Đang ẩn')
           : maskPhoneNumber(p.buyerPhone);
         reserveBtn.classList.add('hidden');
@@ -1047,22 +1054,24 @@
       const viewerNorm = getCurrentViewerPhone();
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
+      const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
 
-      if (isReserved && !isSeller && !isAdmin) {
-        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo người bán để tránh làm gián đoạn giao dịch.');
+      if (isReserved && !isCurrentBuyer && !isSeller && !isAdmin) {
+        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo để tránh làm gián đoạn giao dịch.');
         return;
       }
 
-      if (!p.sellerPhone) {
-        alert('Tin đăng chưa có SĐT người bán.');
-        return;
-      }
+      // Khi người mua/khách liên hệ trên sàn, kết nối qua số/Zalo cầu nối của sàn để bảo vệ SĐT cá nhân người bán;
+      // chủ tin hoặc admin khi cần vẫn có thể gọi/Zalo trực tiếp SĐT người bán.
+      const targetPhone = (isSeller || isAdmin)
+        ? (p.sellerPhone || ADMIN_CONTACT_PHONE)
+        : ADMIN_CONTACT_PHONE;
 
       if (type === 'call') {
-        window.location.href = `tel:${p.sellerPhone}`;
+        window.location.href = `tel:${targetPhone}`;
       } else if (type === 'zalo') {
-        window.open(`https://zalo.me/${p.sellerPhone}`, '_blank', 'noopener,noreferrer');
+        window.open(`https://zalo.me/${targetPhone}`, '_blank', 'noopener,noreferrer');
       }
     }
 
@@ -1108,6 +1117,7 @@
           alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
           return;
         }
+        document.getElementById('userPhoneInput').value = norm;
         updateUserPhone(norm);
       }
 
@@ -1138,7 +1148,7 @@
         price: p.price,
         productName: p.title
       });
-      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}`);
+      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}. Bạn vẫn có thể gọi điện / Zalo để chốt kèo trong thời gian giữ chỗ.`);
     }
 
     function confirmSoldAndCloseQR() {
@@ -1267,8 +1277,11 @@
       document.getElementById('prevPhoto2').classList.add('hidden');
       document.getElementById('placeholder2').classList.remove('hidden');
 
-      if (!isAdminSession()) updateUserPhone(sellerPhone);
-      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets!');
+      if (!isAdminSession()) {
+        document.getElementById('userPhoneInput').value = sellerPhone;
+        updateUserPhone(sellerPhone);
+      }
+      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets! SĐT của bạn được ẩn bảo mật với người xem công khai.');
       switchTab('market');
     }
 
