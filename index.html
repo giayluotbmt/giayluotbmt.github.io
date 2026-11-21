@@ -31,7 +31,7 @@
       <div class="flex items-center gap-1.5 flex-wrap">
         <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1">
           <i class="fa-solid fa-phone text-orange-400 text-xs mr-1.5"></i>
-          <input id="userPhoneInput" type="text" placeholder="Nhập SĐT của bạn..."
+          <input id="userPhoneInput" type="text" maxlength="16" placeholder="SĐT 10 số của bạn..."
             onchange="updateUserPhone(this.value)"
             class="bg-transparent text-xs text-slate-100 placeholder-slate-400 focus:outline-none w-32" />
           <button onclick="savePhoneFromInput()"
@@ -68,14 +68,6 @@
         <span id="badgeMarketCount" class="px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[10px]">0</span>
       </button>
 
-      <!-- NÚT ĐẤU GIÁ 12H NỔI BẬT TRÊN THANH CÔNG CỤ -->
-      <button id="tab-auction" onclick="switchTab('auction')"
-        class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 whitespace-nowrap flex items-center gap-1.5 shadow-sm shadow-amber-500/10 transition">
-        <span>🔨</span>
-        <span>ĐẤU GIÁ 12H</span>
-        <span id="badgeAuctionCount" class="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px]">0</span>
-      </button>
-
       <button id="tab-post" onclick="switchTab('post')"
         class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
         <i class="fa-solid fa-plus-circle text-emerald-400"></i> Đăng Bán Giày
@@ -105,37 +97,12 @@
         <i class="fa-solid fa-headset"></i> HOTLINE / ZALO ADMIN: 0906.075.077
       </span>
       <span class="mx-1.5 text-slate-500">•</span>
-      <span>Lưu SĐT & giữ chỗ 90 phút để mở liên hệ • Chốt bán thành công chuyển 10% phí cầu nối về tài khoản SHB <strong>7772345999</strong></span>
+      <span>Lưu SĐT 10 số & giữ chỗ 90 phút để mở liên hệ • Chốt bán thành công chuyển 10% phí cầu nối về tài khoản SHB <strong>7772345999</strong></span>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="max-w-5xl mx-auto px-3.5 py-4 pb-16">
-
-    <!-- ==================== ĐẤU GIÁ 12H ==================== -->
-    <section id="sec-auction" class="hidden space-y-3.5">
-      <div class="bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-amber-500/15 border border-amber-500/35 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black uppercase">KÈO ĐẤU GIÁ RIÊNG</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-amber-300">🔨 ĐẤU GIÁ 12 GIỜ</h2>
-          </div>
-          <p class="text-xs text-slate-300">Bước giá mặc định +10.000đ mỗi lượt.</p>
-        </div>
-        <button id="btnQuickCreateAuction" type="button" onclick="openQuickAuctionForm()"
-          class="hidden px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs whitespace-nowrap transition shadow">
-          <i class="fa-solid fa-gavel mr-1"></i> + Đăng Kèo Đấu Giá 12h
-        </button>
-      </div>
-
-      <div id="auctionEmptyState" class="hidden text-center py-12 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-        <i class="fa-solid fa-gavel text-3xl text-amber-400/70"></i>
-        <p class="text-sm font-bold text-slate-200">Hiện chưa có phiên Đấu Giá 12h nào đang mở</p>
-        <p class="text-xs text-slate-400">Theo dõi mục này hoặc quay lại Sàn Giày để xem các đôi đang bán.</p>
-      </div>
-
-      <div id="auctionGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-    </section>
 
     <!-- ==================== SÀN GIÀY ==================== -->
     <section id="sec-market" class="space-y-3.5">
@@ -157,7 +124,6 @@
           <select id="statusFilter" onchange="renderMarket()"
             class="bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-orange-500">
             <option value="ALL">Tất cả đang mở</option>
-            <option value="auction">🔨 Đấu giá 12h</option>
             <option value="available">Đang bán</option>
             <option value="negotiating">Đang giữ chỗ 90p</option>
             <option value="sold">Đã bán</option>
@@ -249,9 +215,8 @@
 
           <div class="grid grid-cols-2 gap-2.5">
             <div>
-              <label id="postPriceLabel" class="block text-slate-300 font-bold mb-1">Giá bán (VNĐ) *</label>
+              <label class="block text-slate-300 font-bold mb-1">Giá bán (VNĐ) *</label>
               <input id="postPrice" required type="number" min="10000" step="1000" placeholder="VD: 1800000"
-                oninput="updateAdminAuctionPreview()"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
 
@@ -268,29 +233,6 @@
             </div>
           </div>
 
-          <!-- KHỐI ĐẤU GIÁ 12H CHỈ MỞ CHO QUẢN TRỊ -->
-          <div id="adminAuctionBox" class="hidden bg-amber-500/10 border border-amber-500/35 rounded-2xl p-3 space-y-2.5">
-            <label class="flex items-center gap-2 font-extrabold text-amber-300 cursor-pointer">
-              <input id="postIsAuction" type="checkbox" onchange="toggleAuctionFields()" class="rounded accent-amber-500" />
-              <span>🔨 Bật Đấu Giá 12 Giờ (Chỉ dành cho Quản Trị — tự đặt giá khởi điểm cụ thể)</span>
-            </label>
-
-            <div id="auctionOptionsRow" class="hidden grid grid-cols-2 gap-2 pt-1">
-              <div>
-                <label class="block text-slate-300 font-bold mb-1">Giá bán lẻ tham khảo (tùy chọn):</label>
-                <input id="postRetailRef" type="number" min="0" step="1000" placeholder="VD: 2200000"
-                  oninput="updateAdminAuctionPreview()"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100" />
-              </div>
-              <div>
-                <label class="block text-slate-300 font-bold mb-1">Bước giá mỗi lượt (VNĐ):</label>
-                <input id="postBidStep" type="number" min="5000" step="5000" value="10000"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100" />
-              </div>
-              <p id="auctionStartPreview" class="col-span-2 text-[11px] text-amber-200 font-semibold"></p>
-            </div>
-          </div>
-
           <div class="grid grid-cols-2 gap-2.5">
             <div>
               <label class="block text-slate-300 font-bold mb-1">Khu vực giao dịch *</label>
@@ -300,8 +242,8 @@
             </div>
 
             <div>
-              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán *</label>
-              <input id="postSellerPhone" required type="tel" placeholder="09xxxxxxxx"
+              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán (10 số) *</label>
+              <input id="postSellerPhone" required type="tel" maxlength="12" inputmode="numeric" placeholder="09xxxxxxxx"
                 oninput="checkFormBanWarning('post')"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
@@ -344,6 +286,12 @@
             class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wide shadow-md transition">
             <i class="fa-solid fa-paper-plane mr-1"></i> Đăng Bán Lên Sàn
           </button>
+
+          <div class="bg-slate-800/75 border border-slate-700/80 rounded-xl p-2.5 text-[11px] text-slate-300 space-y-1 leading-relaxed">
+            <p class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i>Lưu ý dành cho người bán:</p>
+            <p>• Tin đăng sẽ tự động ẩn sau <strong>14 ngày</strong> nếu chưa chốt đơn (có thể bấm <strong>Mở Bán Lại</strong> trong mục <em>Tin Của Tôi</em>).</p>
+            <p>• Nếu đã bán qua nguồn khác hoặc đổi ý, vui lòng vào <strong>Tin Của Tôi → Gỡ Tin</strong> ngay. Để tin treo gây giữ chỗ hụt quá 2 lần sẽ bị khóa SĐT.</p>
+          </div>
         </form>
       </div>
     </section>
@@ -368,7 +316,7 @@
     <section id="sec-my-shoes" class="hidden space-y-3">
       <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-lg">
         <h2 class="text-sm font-extrabold text-white">TIN CỦA TÔI</h2>
-        <p class="text-xs text-slate-400">Các tin đăng hoặc giữ chỗ liên quan đến SĐT bạn đã lưu ở thanh trên.</p>
+        <p class="text-xs text-slate-400">Các tin đăng hoặc giữ chỗ liên quan đến SĐT bạn đã lưu ở thanh trên. Tin quá 14 ngày sẽ tự ẩn khỏi Sàn Giày — bấm vào tin để <strong>Mở Bán Lại</strong> hoặc <strong>Gỡ Tin</strong>.</p>
       </div>
 
       <div id="myShoesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
@@ -413,7 +361,7 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2.5 text-xs">
           <h3 class="font-extrabold text-slate-200 uppercase">Khóa SĐT Vi Phạm (Chặn Đăng, Giữ Chỗ & Săn Size)</h3>
           <div class="flex flex-col sm:flex-row gap-2">
-            <input id="banPhoneInput" type="tel" placeholder="SĐT cần khóa..."
+            <input id="banPhoneInput" type="tel" maxlength="12" inputmode="numeric" placeholder="SĐT 10 số cần khóa..."
               class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 flex-1" />
             <input id="banReasonInput" type="text" placeholder="Lý do..."
               class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 flex-1" />
@@ -544,7 +492,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL: DETAIL & 90-MIN LOCK / 12H AUCTION ==================== -->
+  <!-- ==================== MODAL: DETAIL & 90-MIN LOCK ==================== -->
   <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-auto">
       <div class="relative h-64 bg-slate-800">
@@ -566,7 +514,6 @@
             <h3 id="modalTitle" class="text-base font-extrabold text-white"></h3>
           </div>
           <div class="text-right">
-            <span id="modalRetailStrike" class="hidden block text-[11px] line-through text-slate-500"></span>
             <span id="modalPrice" class="text-lg font-black text-orange-400 whitespace-nowrap"></span>
           </div>
         </div>
@@ -580,31 +527,6 @@
 
         <p id="modalNote" class="text-slate-300 bg-slate-800/50 p-2.5 rounded-xl border border-slate-800"></p>
 
-        <!-- KHỐI ĐẤU GIÁ 12H -->
-        <div id="modalAuctionBox" class="hidden bg-amber-500/12 border border-amber-500/35 p-3 rounded-2xl space-y-2">
-          <div class="flex items-center justify-between text-[11px]">
-            <span id="modalAuctionDiscountTag" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold"></span>
-            <span id="modalAuctionTimer" class="font-extrabold text-amber-300"></span>
-          </div>
-          <p class="text-[11px] text-slate-300">
-            Giá cao nhất hiện tại: <strong id="modalTopBidText" class="text-amber-400 text-sm"></strong>
-            • Bước giá: <strong id="modalBidStepText" class="text-white"></strong>
-          </p>
-          <p class="text-[11px] text-slate-400">
-            Khách đang dẫn đầu: <strong id="modalTopBidderText" class="text-slate-200"></strong>
-          </p>
-          <div id="modalBidControls" class="flex gap-2 pt-1">
-            <button id="btnBidMin" type="button" onclick="submitAuctionBid(0)"
-              class="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold transition"></button>
-            <button id="btnBidPlus" type="button" onclick="submitAuctionBid(1)"
-              class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 font-bold transition"></button>
-          </div>
-          <button id="btnCloseAuctionWinner" type="button" onclick="closeAuctionWinner()"
-            class="hidden w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold transition">
-            Chốt Giá Thắng Cho Khách Dẫn Đầu
-          </button>
-        </div>
-
         <div id="modalTimerBox" class="hidden bg-amber-500/15 border border-amber-500/40 p-3 rounded-2xl text-amber-200 space-y-1">
           <p class="font-extrabold text-amber-400"><i class="fa-solid fa-hourglass-half mr-1"></i> ĐANG GIỮ CHỖ 90 PHÚT</p>
           <p>Khách đang chốt: <strong id="modalBuyerPhone" class="text-white"></strong></p>
@@ -612,7 +534,7 @@
         </div>
 
         <p id="contactUnlockHint" class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2">
-          <i class="fa-solid fa-shield-halved mr-1"></i> Lưu SĐT của bạn và bấm <strong>Giữ Chỗ 90 Phút</strong> để mở liên hệ Gọi Điện / Zalo người bán.
+          <i class="fa-solid fa-shield-halved mr-1"></i> Lưu SĐT 10 số của bạn và bấm <strong>Giữ Chỗ 90 Phút</strong> để mở liên hệ Gọi Điện / Zalo người bán.
         </p>
 
         <div class="grid grid-cols-3 gap-2 pt-1">
@@ -650,7 +572,7 @@
 
           <button id="btnDeleteProduct" onclick="triggerDeleteProduct()"
             class="py-2 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 hover:bg-rose-600 hover:text-white font-bold transition">
-            <i class="fa-solid fa-trash-can mr-1"></i> Xóa Tin
+            <i class="fa-solid fa-trash-can mr-1"></i> Gỡ Tin
           </button>
         </div>
       </div>
@@ -686,8 +608,8 @@
         <button onclick="closeAddAlertModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div>
-        <label class="block text-slate-300 font-bold mb-1">Số điện thoại / Zalo *</label>
-        <input id="alertPhoneInput" type="tel" placeholder="09xxxxxxxx" oninput="checkFormBanWarning('alert')"
+        <label class="block text-slate-300 font-bold mb-1">Số điện thoại / Zalo (10 số) *</label>
+        <input id="alertPhoneInput" type="tel" maxlength="12" inputmode="numeric" placeholder="09xxxxxxxx" oninput="checkFormBanWarning('alert')"
           class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
       </div>
       <p id="alertBanWarning" class="hidden text-rose-400 font-bold bg-rose-500/10 border border-rose-500/30 rounded-xl px-3 py-2">
@@ -740,6 +662,7 @@
     const SHB_ACCOUNT = "7772345999";
     const SHB_NAME = "NGUYEN UNG";
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
+    const LISTING_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
     let savedUrl = localStorage.getItem('giayluot_script_url');
     let currentScriptUrl = (savedUrl && savedUrl.includes('/exec')) ? savedUrl.trim() : DEFAULT_SCRIPT_URL;
@@ -748,7 +671,7 @@
     let activePhone = localStorage.getItem('giayluot_user_phone') || "";
 
     let products = [];
-    let auctionsMap = JSON.parse(localStorage.getItem('giayluot_auctions_meta_v1') || '{}');
+    let renewedAtMap = JSON.parse(localStorage.getItem('giayluot_renewed_at_v1') || '{}');
     let alerts = [];
     let deletedAlertKeys = [];
     let deletedProductIds = [];
@@ -765,64 +688,44 @@
     let currentDetailId = null;
     let timerInterval = null;
 
+    // ==================== HẾT HẠN SAU 14 NGÀY ====================
+    function saveRenewedAtMap() {
+      localStorage.setItem('giayluot_renewed_at_v1', JSON.stringify(renewedAtMap));
+    }
+
+    function getProductListingTimestamp(p) {
+      if (!p) return Date.now();
+      const renewedTs = Number(renewedAtMap[String(p.id)] || 0);
+      if (renewedTs > 0) return renewedTs;
+
+      const idMatch = String(p.id || '').match(/^BMT-(\d{10,15})/);
+      if (idMatch) {
+        const ts = Number(idMatch[1]);
+        if (!Number.isNaN(ts) && ts > 1600000000000) return ts;
+      }
+
+      if (p.createdAt) {
+        const str = String(p.createdAt).trim();
+        const vnMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (vnMatch) {
+          const d = new Date(Number(vnMatch[3]), Number(vnMatch[2]) - 1, Number(vnMatch[1]), 12, 0, 0);
+          if (!Number.isNaN(d.getTime())) return d.getTime();
+        }
+        const parsed = new Date(str);
+        if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
+      }
+      return Date.now();
+    }
+
+    function isProductExpired14Days(p) {
+      if (!p || p.status === 'sold' || p.status === 'deleted' || p.status === 'banned') return false;
+      const postedTs = getProductListingTimestamp(p);
+      return (Date.now() - postedTs) > LISTING_TTL_MS;
+    }
+
     // ==================== ĐO CHÂN CHỌN SIZE CHUẨN ====================
     let sgMode = 'cm';
     let sgRecommendedSize = '41';
-
-    function saveAuctionsMap() {
-      localStorage.setItem('giayluot_auctions_meta_v1', JSON.stringify(auctionsMap));
-    }
-
-    function getAuctionMeta(productId) {
-      return auctionsMap[String(productId)] || null;
-    }
-
-    function openQuickAuctionForm() {
-      switchTab('post');
-      if (isAdminSession()) {
-        const cb = document.getElementById('postIsAuction');
-        if (cb) {
-          cb.checked = true;
-          toggleAuctionFields();
-        }
-      }
-    }
-
-    function toggleAuctionFields() {
-      const checked = document.getElementById('postIsAuction')?.checked;
-      document.getElementById('auctionOptionsRow')?.classList.toggle('hidden', !checked);
-      document.getElementById('postPriceLabel').innerText = checked ? "Giá khởi điểm đấu giá (VNĐ) *" : "Giá bán (VNĐ) *";
-      updateAdminAuctionPreview();
-    }
-
-    function updateAdminAuctionPreview() {
-      const checked = document.getElementById('postIsAuction')?.checked;
-      const preview = document.getElementById('auctionStartPreview');
-      if (!checked || !preview) return;
-      const startPrice = Number(document.getElementById('postPrice')?.value || 0);
-      const retailRef = Number(document.getElementById('postRetailRef')?.value || 0);
-      if (startPrice > 0 && retailRef > startPrice) {
-        const diffPct = Math.round(((retailRef - startPrice) / retailRef) * 100);
-        preview.innerText = `Khởi điểm ${formatVND(startPrice)} • Thấp hơn giá bán lẻ ${formatVND(retailRef)} khoảng ${diffPct}% • Mở trong 12h.`;
-      } else if (startPrice > 0) {
-        preview.innerText = `Giá khởi điểm phiên 12h: ${formatVND(startPrice)}.`;
-      } else {
-        preview.innerText = "Nhập số tiền khởi điểm cụ thể (VD: 1800000) và bước giá (mặc định +10.000đ).";
-      }
-    }
-
-    function syncAdminAuctionUI() {
-      const isAdmin = isAdminSession();
-      const box = document.getElementById('adminAuctionBox');
-      if (box) box.classList.toggle('hidden', !isAdmin);
-      const quickBtn = document.getElementById('btnQuickCreateAuction');
-      if (quickBtn) quickBtn.classList.toggle('hidden', !isAdmin);
-      if (!isAdmin) {
-        const cb = document.getElementById('postIsAuction');
-        if (cb) cb.checked = false;
-        toggleAuctionFields();
-      }
-    }
 
     function openSizeGuideModal() {
       if (selectedCategory && selectedCategory !== 'ALL') {
@@ -914,6 +817,7 @@
 
       const matchingCount = products.filter(p =>
         (p.status === 'available' || p.status === 'negotiating') &&
+        !isProductExpired14Days(p) &&
         !isPhoneBanned(p.sellerPhone) &&
         String(p.size).replace(/\D/g, '') === sgRecommendedSize &&
         (!sport || p.category === sport)
@@ -1101,9 +1005,7 @@
         }
       }
       loadLocalCache();
-      syncAdminAuctionUI();
       renderMarket();
-      renderAuctionTab();
       renderAlerts();
       renderMyShoes();
       checkAdminLock();
@@ -1116,22 +1018,24 @@
 
       setInterval(() => syncWithCloud(false), 45000);
       setInterval(checkExpiredLocks, 10000);
-      setInterval(() => {
-        renderMarket();
-        renderAuctionTab();
-      }, 1000);
     };
 
     function normalizePhone(phone) {
       let digits = String(phone || "").replace(/\D/g, "");
       if (!digits) return "";
       if (digits === ADMIN_CODE) return ADMIN_CODE;
-      if (digits.startsWith("84") && digits.length >= 10 && digits.length <= 11) {
+      if (digits.startsWith("84") && digits.length === 11) {
         digits = "0" + digits.slice(2);
-      } else if (!digits.startsWith("0") && digits.length === 9) {
-        digits = "0" + digits;
       }
       return digits;
+    }
+
+    function isValidVnPhone10(phone) {
+      const digits = normalizePhone(phone);
+      if (!/^0(3|5|7|8|9)\d{8}$/.test(digits)) return false;
+      if (/^0\d(\d)\1{7}$/.test(digits)) return false;
+      if (digits === "0123456789" || digits === "0987654321") return false;
+      return true;
     }
 
     function calcFee10(price) {
@@ -1144,6 +1048,11 @@
 
     function updateUserPhone(val) {
       const cleaned = normalizePhone(val);
+      if (cleaned && cleaned !== ADMIN_CODE && !isValidVnPhone10(cleaned)) {
+        alert('Vui lòng nhập đúng số điện thoại di động 10 số hợp lệ (VD: 09xxxxxxxx)!');
+        document.getElementById('userPhoneInput').value = activePhone || "";
+        return;
+      }
       activePhone = cleaned;
       localStorage.setItem('giayluot_user_phone', activePhone);
       if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
@@ -1152,12 +1061,10 @@
       if (activePhone && !isAdminSession()) {
         document.getElementById('postSellerPhone').value = activePhone;
       }
-      syncAdminAuctionUI();
       checkAdminLock();
       checkFormBanWarning('post');
       checkFormBanWarning('alert');
       renderMarket();
-      renderAuctionTab();
       renderMyShoes();
       renderAlerts();
       if (currentDetailId && !document.getElementById('detailModal').classList.contains('hidden')) {
@@ -1168,11 +1075,15 @@
     function savePhoneFromInput() {
       const rawInput = document.getElementById('userPhoneInput').value;
       const cleaned = normalizePhone(rawInput);
+      if (cleaned && cleaned !== ADMIN_CODE && !isValidVnPhone10(cleaned)) {
+        alert('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 số di động (đầu 03, 05, 07, 08, 09).');
+        return;
+      }
       updateUserPhone(cleaned);
       if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
         return;
       }
-      alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên! Bạn đã có thể bật Đấu Giá 12h khi đăng bán.' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
+      alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên!' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
     }
 
     function loadLocalCache() {
@@ -1220,36 +1131,21 @@
         }
       }
 
-      ['market', 'auction', 'post', 'alerts', 'my-shoes', 'admin'].forEach(t => {
+      ['market', 'post', 'alerts', 'my-shoes', 'admin'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
         if (!btn) return;
-        if (t === 'auction') {
-          btn.classList.remove('ring-2', 'ring-amber-300', 'bg-amber-400', 'text-slate-950');
-          btn.classList.add('bg-amber-500/20', 'text-amber-300');
-        } else {
-          btn.classList.remove('border-orange-500', 'text-orange-400');
-          btn.classList.add('border-transparent', 'text-slate-400');
-        }
+        btn.classList.remove('border-orange-500', 'text-orange-400');
+        btn.classList.add('border-transparent', 'text-slate-400');
       });
 
       document.getElementById(`sec-${tabId}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`tab-${tabId}`);
       if (activeBtn) {
-        if (tabId === 'auction') {
-          activeBtn.classList.remove('bg-amber-500/20', 'text-amber-300');
-          activeBtn.classList.add('ring-2', 'ring-amber-300', 'bg-amber-400', 'text-slate-950');
-        } else {
-          activeBtn.classList.remove('border-transparent', 'text-slate-400');
-          activeBtn.classList.add('border-orange-500', 'text-orange-400');
-        }
+        activeBtn.classList.remove('border-transparent', 'text-slate-400');
+        activeBtn.classList.add('border-orange-500', 'text-orange-400');
       }
 
-      if (tabId === 'post') syncAdminAuctionUI();
-      if (tabId === 'auction') {
-        syncAdminAuctionUI();
-        renderAuctionTab();
-      }
       if (tabId === 'market') renderMarket();
       if (tabId === 'alerts') renderAlerts();
       if (tabId === 'my-shoes') renderMyShoes();
@@ -1336,14 +1232,13 @@
           checkFormBanWarning('post');
           checkFormBanWarning('alert');
           renderMarket();
-          renderAuctionTab();
           renderAlerts();
           renderMyShoes();
           renderAdminData();
           setCloudStatus('ok', 'Đã nối Google Sheets');
 
           if (isManual) {
-            const availCount = products.filter(x => x.status === 'available' || x.status === 'negotiating').length;
+            const availCount = products.filter(x => (x.status === 'available' || x.status === 'negotiating') && !isProductExpired14Days(x)).length;
             alert(`Đã đồng bộ thành công từ Google Sheets (${availCount} tin đang mở / tổng ${products.length} tin).`);
           }
         } else {
@@ -1403,37 +1298,22 @@
       if (updated) {
         saveLocalCache();
         renderMarket();
-        renderAuctionTab();
         renderMyShoes();
       }
     }
 
-    function formatAuctionCountdown(ms) {
-      if (ms <= 0) return "Đã hết 12h";
-      const totalSec = Math.floor(ms / 1000);
-      const h = Math.floor(totalSec / 3600);
-      const m = Math.floor((totalSec % 3600) / 60);
-      const s = totalSec % 60;
-      return `${String(h).padStart(2, '0')}h:${String(m).padStart(2, '0')}m:${String(s).padStart(2, '0')}s`;
-    }
-
     function buildShoeCardHtml(p) {
-      const auc = getAuctionMeta(p.id);
       const isReserved = p.status === 'negotiating';
       const isSold = p.status === 'sold';
+      const isExpired = isProductExpired14Days(p);
       const img = p.photo1 || 'https://placehold.co/600x450/1e293b/94a3b8?text=GIAY+LUOT+BMT';
       let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow">Đang bán</span>`;
-      if (auc) {
-        const leftMs = auc.endsAt - Date.now();
-        statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-400 text-slate-950 shadow">🔨 12h • ${formatAuctionCountdown(leftMs)}</span>`;
-      } else if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
-      else if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
-
-      const displayPrice = auc ? (auc.currentBid || p.price) : p.price;
-      const priceLabel = auc ? `Giá đấu cao nhất (+${formatVND(auc.bidStep || 10000)})` : `Giá bán`;
+      if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
+      else if (isExpired) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-700 text-amber-300 border border-amber-500/40 shadow">Ẩn quá 14 ngày</span>`;
+      else if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
 
       return `
-        <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border ${auc ? 'border-amber-500/40' : 'border-slate-800'} overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+        <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
           <div class="relative w-full h-48 bg-slate-800 overflow-hidden">
             <img src="${img}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
             <div class="absolute top-2.5 left-2.5">${statusBadge}</div>
@@ -1441,48 +1321,20 @@
           </div>
           <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
             <div>
-              <p class="text-[10px] font-extrabold uppercase tracking-wider ${auc ? 'text-amber-400' : 'text-orange-400'}">${escapeHtml(p.category)}</p>
+              <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">${escapeHtml(p.category)}</p>
               <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h3>
               <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${escapeHtml(p.location)} • ${escapeHtml(p.condition)}</p>
             </div>
             <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between">
               <div>
-                <span class="block text-[10px] text-slate-500">${priceLabel}</span>
-                <span class="text-sm font-black ${auc ? 'text-amber-400' : 'text-orange-400'}">${formatVND(displayPrice)}</span>
+                <span class="block text-[10px] text-slate-500">Giá bán</span>
+                <span class="text-sm font-black text-orange-400">${formatVND(p.price)}</span>
               </div>
-              <span class="text-xs font-bold text-slate-400 group-hover:text-orange-400">${auc ? 'Trả giá →' : 'Xem tin →'}</span>
+              <span class="text-xs font-bold text-slate-400 group-hover:text-orange-400">Xem tin →</span>
             </div>
           </div>
         </div>
       `;
-    }
-
-    function renderAuctionTab() {
-      const grid = document.getElementById('auctionGrid');
-      const empty = document.getElementById('auctionEmptyState');
-      const deletedSet = new Set(deletedProductIds.map(id => String(id)));
-
-      const activeAuctions = products.filter(p =>
-        p.status !== 'banned' &&
-        p.status !== 'deleted' &&
-        p.status !== 'sold' &&
-        !deletedSet.has(String(p.id)) &&
-        !isPhoneBanned(p.sellerPhone) &&
-        Boolean(getAuctionMeta(p.id))
-      );
-
-      const badge = document.getElementById('badgeAuctionCount');
-      if (badge) badge.innerText = activeAuctions.length;
-
-      if (!grid || !empty) return;
-      if (activeAuctions.length === 0) {
-        grid.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-
-      empty.classList.add('hidden');
-      grid.innerHTML = activeAuctions.map(buildShoeCardHtml).join('');
     }
 
     function setCategoryFilter(cat) {
@@ -1592,9 +1444,8 @@
       const statusBaseProducts = products.filter(p => {
         if (p.status === 'banned' || p.status === 'deleted' || deletedSet.has(String(p.id))) return false;
         if (isPhoneBanned(p.sellerPhone)) return false;
-        const auc = getAuctionMeta(p.id);
+        if (isProductExpired14Days(p)) return false;
         if (statusFilter === 'ALL' && p.status === 'sold') return false;
-        if (statusFilter === 'auction' && !auc) return false;
         if (statusFilter === 'available' && p.status !== 'available') return false;
         if (statusFilter === 'negotiating' && p.status !== 'negotiating') return false;
         if (statusFilter === 'sold' && p.status !== 'sold') return false;
@@ -1641,12 +1492,12 @@
       if (p.photo2) thumbBox.innerHTML += `<img src="${p.photo2}" onclick="document.getElementById('modalMainImg').src='${p.photo2}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
 
       const viewerNorm = getCurrentViewerPhone();
-      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE);
+      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE && isValidVnPhone10(viewerNorm));
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
       const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
-      const auc = getAuctionMeta(p.id);
+      const isExpired = isProductExpired14Days(p);
 
       const canUnlockContact = Boolean(
         isAdmin ||
@@ -1663,68 +1514,34 @@
         ? (p.sellerPhone || 'Chưa có SĐT')
         : maskPhoneNumber(p.sellerPhone);
       document.getElementById('modalNote').innerText = p.description ? `Ghi chú: ${p.description}` : 'Không có ghi chú thêm.';
-
-      const retailStrike = document.getElementById('modalRetailStrike');
-      if (auc && Number(auc.retailPrice || 0) > 0) {
-        retailStrike.classList.remove('hidden');
-        retailStrike.innerText = `Giá lẻ tham khảo: ${formatVND(auc.retailPrice)}`;
-        document.getElementById('modalPrice').innerText = formatVND(auc.currentBid || p.price);
-      } else {
-        retailStrike.classList.add('hidden');
-        document.getElementById('modalPrice').innerText = formatVND(p.price);
-      }
+      document.getElementById('modalPrice').innerText = formatVND(p.price);
 
       const statusBadge = document.getElementById('modalStatusBadge');
-      if (auc) {
-        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-400 text-slate-950 shadow";
-        statusBadge.innerText = `Đấu giá 12h (+${formatVND(auc.bidStep || 10000)})`;
+      if (p.status === 'sold') {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-600 text-white shadow";
+        statusBadge.innerText = "Đã bán";
+      } else if (isExpired) {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-slate-700 text-amber-300 border border-amber-500/40 shadow";
+        statusBadge.innerText = "Đã ẩn quá 14 ngày";
       } else if (isReserved) {
         statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500 text-white shadow";
         statusBadge.innerText = "Giữ chỗ 90 phút";
-      } else if (p.status === 'sold') {
-        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-600 text-white shadow";
-        statusBadge.innerText = "Đã bán";
       } else {
         statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow";
         statusBadge.innerText = "Đang bán";
       }
 
-      const aucBox = document.getElementById('modalAuctionBox');
-      if (auc) {
-        aucBox.classList.remove('hidden');
-        const leftMs = auc.endsAt - Date.now();
-        const ended = leftMs <= 0;
-        const step = Number(auc.bidStep || 10000);
-        const cur = Number(auc.currentBid || p.price);
-        const minBid = cur + step;
-
-        document.getElementById('modalAuctionDiscountTag').innerText = `Khởi điểm: ${formatVND(auc.startPrice || p.price)}`;
-        document.getElementById('modalAuctionTimer').innerText = ended ? 'Đã kết thúc phiên 12h' : `Còn ${formatAuctionCountdown(leftMs)}`;
-        document.getElementById('modalTopBidText').innerText = formatVND(cur);
-        document.getElementById('modalBidStepText').innerText = `+${formatVND(step)}`;
-        document.getElementById('modalTopBidderText').innerText = auc.topBidder
-          ? (isAdmin || normalizePhone(auc.topBidder) === viewerNorm ? auc.topBidder : maskPhoneNumber(auc.topBidder))
-          : 'Chưa có người trả giá';
-
-        const bidControls = document.getElementById('modalBidControls');
-        bidControls.classList.toggle('hidden', ended || p.status === 'sold');
-        document.getElementById('btnBidMin').innerText = `Trả ${formatVND(minBid)}`;
-        document.getElementById('btnBidPlus').innerText = `+${formatVND(step + 20000)}`;
-
-        const closeBtn = document.getElementById('btnCloseAuctionWinner');
-        closeBtn.classList.toggle('hidden', !(isAdmin && auc.topBidder && p.status !== 'sold'));
-      } else {
-        aucBox.classList.add('hidden');
-      }
-
       const hintEl = document.getElementById('contactUnlockHint');
       if (hintEl) {
-        if (canUnlockContact) {
+        if (isExpired) {
+          hintEl.className = "text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-2";
+          hintEl.innerHTML = `<i class="fa-solid fa-clock-rotate-left mr-1"></i> Tin này đã quá 14 ngày nên đang tự ẩn khỏi sàn. Nếu vẫn còn giày, chủ tin bấm <strong>Mở Bán Lại</strong> bên dưới để hiển thị tiếp 14 ngày.`;
+        } else if (canUnlockContact) {
           hintEl.className = "text-[11px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-3 py-2";
           hintEl.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> Đã mở liên hệ người bán. Hai bên tự thương lượng & tự thanh toán, chốt xong chuyển 10% phí sàn về SHB <strong>7772345999</strong>.`;
         } else if (!hasLoggedInPhone) {
           hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
-          hintEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1"></i> Số người bán đang ẩn. Nhập SĐT của bạn ở thanh trên và bấm <strong>Giữ Chỗ 90 Phút</strong> để hiện Gọi Điện / Zalo.`;
+          hintEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1"></i> Số người bán đang ẩn. Nhập SĐT 10 số của bạn ở thanh trên và bấm <strong>Giữ Chỗ 90 Phút</strong> để hiện Gọi Điện / Zalo.`;
         } else if (isReserved && !isCurrentBuyer) {
           hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
           hintEl.innerHTML = `<i class="fa-solid fa-hourglass-half mr-1"></i> Đôi này đang được khách khác giữ chỗ 90 phút. Liên hệ người bán tạm khóa để tránh gián đoạn kèo.`;
@@ -1757,7 +1574,7 @@
 
       const timerBox = document.getElementById('modalTimerBox');
       const reserveBtn = document.getElementById('btnReserveAction');
-      if (isReserved && p.lockedUntil) {
+      if (isReserved && p.lockedUntil && !isExpired) {
         timerBox.classList.remove('hidden');
         document.getElementById('modalBuyerPhone').innerText = (isAdmin || isCurrentBuyer || isSeller)
           ? (p.buyerPhone || 'Đang ẩn')
@@ -1766,7 +1583,7 @@
         startCountdown(p.lockedUntil);
       } else {
         timerBox.classList.add('hidden');
-        reserveBtn.classList.toggle('hidden', p.status === 'sold' || Boolean(auc));
+        reserveBtn.classList.toggle('hidden', p.status === 'sold' || isExpired);
         if (timerInterval) clearInterval(timerInterval);
       }
 
@@ -1781,81 +1598,12 @@
       modal.classList.remove('hidden');
     }
 
-    function submitAuctionBid(extraStepMode) {
-      const p = products.find(x => x.id === currentDetailId);
-      const auc = p ? getAuctionMeta(p.id) : null;
-      if (!p || !auc) return;
-
-      if (Date.now() >= auc.endsAt) {
-        alert("Phiên đấu giá 12h đã kết thúc!");
-        return;
-      }
-
-      const blockedBefore = findAnyBannedPhone();
-      if (blockedBefore) {
-        alert(`SĐT ${blockedBefore} đang bị khóa trên sàn, không thể trả giá!`);
-        return;
-      }
-
-      let bidder = getCurrentViewerPhone();
-      if (!bidder || bidder === ADMIN_CODE) {
-        const raw = prompt("Nhập SĐT của bạn để tham gia trả giá:");
-        if (!raw) return;
-        const norm = normalizePhone(raw);
-        if (!norm || norm === ADMIN_CODE) {
-          alert("Vui lòng nhập số điện thoại hợp lệ!");
-          return;
-        }
-        if (isPhoneBanned(norm)) {
-          alert(`SĐT ${norm} đang bị khóa trên sàn, không thể trả giá!`);
-          return;
-        }
-        document.getElementById('userPhoneInput').value = norm;
-        updateUserPhone(norm);
-        bidder = norm;
-      }
-
-      const step = Number(auc.bidStep || 10000);
-      const currentTop = Number(auc.currentBid || p.price);
-      const newBid = extraStepMode === 1 ? (currentTop + step + 20000) : (currentTop + step);
-
-      auc.currentBid = newBid;
-      auc.topBidder = bidder;
-      p.price = newBid;
-      saveAuctionsMap();
-      saveLocalCache();
-      renderMarket();
-      renderAuctionTab();
-      openDetailModal(p.id);
-      alert(`Đã ghi nhận mức trả giá ${formatVND(newBid)} cho SĐT ${bidder}!`);
-    }
-
-    function closeAuctionWinner() {
-      if (!isAdminSession()) return;
-      const p = products.find(x => x.id === currentDetailId);
-      const auc = p ? getAuctionMeta(p.id) : null;
-      if (!p || !auc || !auc.topBidder) return;
-
-      p.buyerPhone = auc.topBidder;
-      p.price = auc.currentBid;
-      p.status = 'negotiating';
-      p.lockedUntil = Date.now() + (90 * 60 * 1000);
-      delete auctionsMap[String(p.id)];
-      saveAuctionsMap();
-      saveLocalCache();
-      renderMarket();
-      renderAuctionTab();
-      renderMyShoes();
-      openDetailModal(p.id);
-      alert(`Đã chốt thắng đấu giá cho SĐT ${auc.topBidder} ở mức ${formatVND(p.price)} và mở giữ chỗ 90 phút!`);
-    }
-
     function handleContactAction(type) {
       const p = products.find(x => x.id === currentDetailId);
       if (!p) return;
 
       const viewerNorm = getCurrentViewerPhone();
-      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE);
+      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE && isValidVnPhone10(viewerNorm));
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
       const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
@@ -1863,7 +1611,7 @@
 
       if (!isAdmin && !isSeller) {
         if (!hasLoggedInPhone) {
-          alert('Vui lòng nhập và lưu SĐT của bạn ở thanh trên cùng, sau đó bấm "Giữ Chỗ 90 Phút" để mở liên hệ người bán.');
+          alert('Vui lòng nhập và lưu SĐT 10 số của bạn ở thanh trên cùng, sau đó bấm "Giữ Chỗ 90 Phút" để mở liên hệ người bán.');
           return;
         }
         if (!isReserved || !isCurrentBuyer) {
@@ -1915,12 +1663,12 @@
       }
 
       let buyerPhone = getCurrentViewerPhone();
-      if (!buyerPhone || buyerPhone === ADMIN_CODE) {
-        const phone = prompt("Nhập SĐT của bạn để giữ chỗ 90 phút và mở liên hệ người bán:");
+      if (!buyerPhone || buyerPhone === ADMIN_CODE || !isValidVnPhone10(buyerPhone)) {
+        const phone = prompt("Nhập SĐT di động 10 số của bạn để giữ chỗ 90 phút và mở liên hệ người bán:");
         if (!phone) return;
         const norm = normalizePhone(phone);
-        if (!norm || norm === ADMIN_CODE) {
-          alert('Vui lòng nhập số điện thoại hợp lệ!');
+        if (!isValidVnPhone10(norm)) {
+          alert('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 số di động Việt Nam (VD: 09xxxxxxxx).');
           return;
         }
         if (isPhoneBanned(norm)) {
@@ -1938,7 +1686,7 @@
       }
 
       const p = products.find(x => x.id === currentDetailId);
-      if (!p || p.status !== 'available') {
+      if (!p || p.status !== 'available' || isProductExpired14Days(p)) {
         alert('Đôi giày này hiện không còn ở trạng thái mở giữ chỗ.');
         return;
       }
@@ -1948,7 +1696,6 @@
       p.buyerPhone = buyerPhone;
       saveLocalCache();
       renderMarket();
-      renderAuctionTab();
       renderMyShoes();
       openDetailModal(p.id);
 
@@ -1995,15 +1742,12 @@
         if (deleteAfterSold) {
           if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
           products = products.filter(x => String(x.id) !== targetId);
-          delete auctionsMap[targetId];
-          saveAuctionsMap();
         } else {
           p.status = 'sold';
         }
 
         saveLocalCache();
         renderMarket();
-        renderAuctionTab();
         renderMyShoes();
 
         await postToCloud({
@@ -2054,20 +1798,17 @@
 
       const msg = p.status === 'sold'
         ? `Xóa vĩnh viễn tin "${p.title}" khỏi sàn?`
-        : `Đôi "${p.title}" chưa đánh dấu Đã bán. Nếu đã bán xong, vui lòng bấm "Đã Bán" để quét QR phí 10% trước.\n\nBạn vẫn muốn gỡ/xóa tin này khỏi sàn?`;
+        : `Đôi "${p.title}" chưa đánh dấu Đã bán. Nếu đã bán qua sàn, vui lòng bấm "Đã Bán" để quét QR phí 10% trước.\n\nNếu bạn đã bán ngoài hoặc đổi ý, xác nhận gỡ tin này khỏi sàn?`;
 
       if (!confirm(msg)) return;
 
       const targetId = String(p.id);
       if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
       products = products.filter(x => String(x.id) !== targetId);
-      delete auctionsMap[targetId];
-      saveAuctionsMap();
 
       saveLocalCache();
       closeDetailModal();
       renderMarket();
-      renderAuctionTab();
       renderMyShoes();
 
       await postToCloud({
@@ -2077,19 +1818,21 @@
         buyerPhone: p.buyerPhone || ''
       });
 
-      alert('Đã xóa tin đăng khỏi sàn.');
+      alert('Đã gỡ tin đăng khỏi sàn.');
     }
 
     async function triggerReopenProduct() {
       const p = products.find(x => x.id === currentDetailId);
-      if (!p || !confirm('Mở bán lại đôi giày này?')) return;
+      if (!p || !confirm('Mở bán lại và gia hạn hiển thị 14 ngày cho đôi giày này?')) return;
       p.status = 'available';
       p.lockedUntil = null;
       p.buyerPhone = null;
+      renewedAtMap[String(p.id)] = Date.now();
+      saveRenewedAtMap();
       saveLocalCache();
       openDetailModal(p.id);
       renderMarket();
-      renderAuctionTab();
+      renderMyShoes();
       await postToCloud({ action: 'UPDATE_STATUS', productId: p.id, newStatus: 'available' });
     }
 
@@ -2134,8 +1877,8 @@
       const sellerPhone = normalizePhone(rawSellerInput);
       const blocked = findAnyBannedPhone(sellerPhone);
 
-      if (!sellerPhone || sellerPhone === ADMIN_CODE) {
-        alert('Vui lòng nhập SĐT người bán hợp lệ!');
+      if (!isValidVnPhone10(sellerPhone)) {
+        alert('Vui lòng nhập đúng SĐT di động 10 số hợp lệ (VD: 09xxxxxxxx)!');
         return;
       }
       if (blocked) {
@@ -2148,22 +1891,7 @@
       if (btn) { btn.disabled = true; btn.innerText = "Đang gửi lên Google Sheets..."; }
 
       const startPrice = Number(document.getElementById('postPrice').value);
-      const isAuction = Boolean(isAdminSession() && document.getElementById('postIsAuction')?.checked);
-      const retailRef = Number(document.getElementById('postRetailRef')?.value || 0);
-      const bidStep = Math.max(5000, Number(document.getElementById('postBidStep')?.value || 10000));
-
       const productId = "BMT-" + Date.now();
-      if (isAuction) {
-        auctionsMap[productId] = {
-          startPrice: startPrice,
-          retailPrice: retailRef > 0 ? retailRef : 0,
-          currentBid: startPrice,
-          bidStep: bidStep,
-          topBidder: "",
-          endsAt: Date.now() + (12 * 3600 * 1000)
-        };
-        saveAuctionsMap();
-      }
 
       const newProduct = {
         id: productId,
@@ -2198,10 +1926,6 @@
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Đăng Bán Lên Sàn'; }
       document.getElementById('postForm').reset();
       document.getElementById('postLocation').value = "Buôn Ma Thuột";
-      document.getElementById('postBidStep').value = "10000";
-      const cb = document.getElementById('postIsAuction');
-      if (cb) cb.checked = false;
-      toggleAuctionFields();
       tempPhoto1 = ""; tempPhoto2 = "";
       document.getElementById('prevPhoto1').classList.add('hidden');
       document.getElementById('placeholder1').classList.remove('hidden');
@@ -2212,11 +1936,8 @@
         document.getElementById('userPhoneInput').value = sellerPhone;
         updateUserPhone(sellerPhone);
       }
-      renderAuctionTab();
-      alert(isAuction
-        ? `Đã đăng phiên Đấu Giá 12h (khởi điểm ${formatVND(startPrice)}, bước giá +${formatVND(bidStep)})!`
-        : 'Đã đăng bán lên sàn và gửi đồng bộ Google Sheets!');
-      switchTab(isAuction ? 'auction' : 'market');
+      alert('Đã đăng bán lên sàn! Lưu ý: nếu bán được qua kênh khác, nhớ vào "Tin Của Tôi" bấm Gỡ Tin giúp sàn nhé.');
+      switchTab('market');
     }
 
     function getShareableBaseUrl() {
@@ -2280,8 +2001,8 @@
       const size = document.getElementById('alertSizeInput').value.trim();
       const blocked = findAnyBannedPhone(phone);
 
-      if (!phone || phone === ADMIN_CODE || !size) {
-        alert('Vui lòng điền đủ SĐT hợp lệ và Size!');
+      if (!isValidVnPhone10(phone) || !size) {
+        alert('Vui lòng điền đúng SĐT di động 10 số hợp lệ (VD: 09xxxxxxxx) và Size!');
         return;
       }
       if (blocked) {
@@ -2338,7 +2059,7 @@
       document.getElementById('badgeAlertsCount').innerText = visible.length;
 
       if (!viewerNorm && !isAdmin) {
-        list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Tin săn size được ẩn bảo mật với người khác. Nhập SĐT của bạn ở ô trên cùng để xem và quản lý tin săn size của riêng bạn.</div>`;
+        list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Tin săn size được ẩn bảo mật với người khác. Nhập SĐT 10 số của bạn ở ô trên cùng để xem và quản lý tin săn size của riêng bạn.</div>`;
         return;
       }
 
@@ -2372,7 +2093,7 @@
       const grid = document.getElementById('myShoesGrid');
       document.getElementById('badgeMyCount').innerText = '0';
       if (!activePhone || isAdminSession()) {
-        grid.innerHTML = `<div class="col-span-2 text-center py-10 bg-slate-900 rounded-2xl border border-slate-800 text-xs text-slate-400 space-y-1.5"><i class="fa-solid fa-phone text-xl text-slate-600"></i><p>Nhập SĐT của bạn ở thanh trên cùng để xem tin đăng hoặc giữ chỗ.</p></div>`;
+        grid.innerHTML = `<div class="col-span-2 text-center py-10 bg-slate-900 rounded-2xl border border-slate-800 text-xs text-slate-400 space-y-1.5"><i class="fa-solid fa-phone text-xl text-slate-600"></i><p>Nhập SĐT 10 số của bạn ở thanh trên cùng để xem tin đăng hoặc giữ chỗ.</p></div>`;
         return;
       }
       const myPhoneNorm = normalizePhone(activePhone);
@@ -2389,13 +2110,15 @@
       }
       grid.innerHTML = myItems.map(p => {
         const isMyPost = normalizePhone(p.sellerPhone) === myPhoneNorm;
+        const expired = isProductExpired14Days(p);
+        const statusText = expired ? 'Ẩn quá 14 ngày' : (p.status === 'sold' ? 'Đã bán' : (p.status === 'negotiating' ? 'Giữ chỗ 90p' : 'Đang bán'));
         return `
-          <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 p-3 rounded-2xl border border-slate-800 flex items-center gap-3 cursor-pointer hover:border-orange-500/70 transition shadow-md">
+          <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 p-3 rounded-2xl border ${expired ? 'border-amber-500/40' : 'border-slate-800'} flex items-center gap-3 cursor-pointer hover:border-orange-500/70 transition shadow-md">
             <img src="${p.photo1 || 'https://placehold.co/150x150/1e293b/94a3b8?text=GIAY'}" class="w-16 h-16 rounded-xl object-cover">
             <div class="flex-grow space-y-1 text-xs">
               <div class="flex items-center justify-between">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isMyPost ? 'bg-orange-500/20 text-orange-300' : 'bg-sky-500/20 text-sky-300'}">${isMyPost ? 'Tin của tôi' : 'Đang giữ chỗ'}</span>
-                <span class="text-[11px] font-semibold text-slate-400">${p.status}</span>
+                <span class="text-[11px] font-semibold ${expired ? 'text-amber-300' : 'text-slate-400'}">${statusText}</span>
               </div>
               <h4 class="font-extrabold text-white line-clamp-1">${escapeHtml(p.title)}</h4>
               <p class="text-orange-400 font-black">${formatVND(p.price)}</p>
@@ -2419,7 +2142,6 @@
         badge.innerText = "LOCKED";
         badge.className = "px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[11px] font-bold";
       }
-      syncAdminAuctionUI();
     }
 
     function saveAdminScriptUrl() {
@@ -2434,13 +2156,12 @@
       if (!isAdminSession()) return;
       const phone = normalizePhone(document.getElementById('banPhoneInput').value);
       const reason = document.getElementById('banReasonInput').value.trim() || 'Vi phạm quy định sàn';
-      if (!phone || phone === ADMIN_CODE) return alert('Nhập SĐT hợp lệ cần khóa!');
+      if (!isValidVnPhone10(phone)) return alert('Nhập đúng SĐT di động 10 số hợp lệ cần khóa!');
       if (!blacklist.includes(phone)) {
         blacklist.push(phone);
         saveLocalCache();
         renderAdminData();
         renderMarket();
-        renderAuctionTab();
         renderAlerts();
         checkFormBanWarning('post');
         checkFormBanWarning('alert');
@@ -2460,7 +2181,6 @@
       saveLocalCache();
       renderAdminData();
       renderMarket();
-      renderAuctionTab();
       renderAlerts();
       checkFormBanWarning('post');
       checkFormBanWarning('alert');
