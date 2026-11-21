@@ -268,7 +268,7 @@
       <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg flex items-center justify-between gap-3">
         <div>
           <h2 class="text-sm font-extrabold text-white">SĂN SIZE GIÀY THEO YÊU CẦU</h2>
-          <p class="text-xs text-slate-400">Tin săn size ẩn hoàn toàn với người khác — chỉ chủ số hoặc quản trị mới thấy.</p>
+          <p class="text-xs text-slate-400">Tin săn size ẩn hoàn toàn với người khác — chỉ chủ số mới thấy.</p>
         </div>
         <button onclick="openAddAlertModal()"
           class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap transition">
@@ -502,7 +502,7 @@
 
   <script>
     const ADMIN_CODE = "204201504042019";
-    const ADMIN_OPERATOR_PHONE = "0909215078";
+    const ALERT_OWNER_OVERRIDE_PHONE = "0909215078";
     const SHB_ACCOUNT = "7772345999";
     const SHB_NAME = "NGUYEN UNG";
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
@@ -529,8 +529,14 @@
     let timerInterval = null;
 
     function isAdminSession() {
-      const clean = String(activePhone || "").replace(/\D/g, "");
-      return clean === ADMIN_CODE || normalizePhone(clean) === ADMIN_OPERATOR_PHONE;
+      return String(activePhone || "").replace(/\D/g, "") === ADMIN_CODE;
+    }
+
+    function canDeleteAlertItem(alertItem) {
+      const viewerNorm = getCurrentViewerPhone();
+      if (!viewerNorm) return false;
+      if (viewerNorm === ADMIN_CODE || viewerNorm === ALERT_OWNER_OVERRIDE_PHONE) return true;
+      return normalizePhone(alertItem?.phone) === viewerNorm;
     }
 
     function isPhoneBanned(phone) {
@@ -1349,7 +1355,7 @@
     async function deleteAlertByIndex(idx) {
       const visible = getVisibleAlerts();
       const target = visible[idx];
-      if (!target) return;
+      if (!target || !canDeleteAlertItem(target)) return;
 
       const targetKey = getAlertKey(target);
       alerts = alerts.filter(a => String(a.id) !== String(target.id) && getAlertKey(a) !== targetKey);
@@ -1394,7 +1400,7 @@
 
       list.innerHTML = visible.map((a, idx) => {
         const phoneNorm = normalizePhone(a.phone);
-        const canDelete = isAdmin || (viewerNorm && phoneNorm && viewerNorm === phoneNorm);
+        const canDelete = canDeleteAlertItem(a);
         const displayPhone = isAdmin ? (phoneNorm || 'Đang ẩn') : maskPhoneNumber(phoneNorm);
         return `
           <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs shadow-md">
