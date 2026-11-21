@@ -171,7 +171,7 @@
         <form id="postForm" onsubmit="handlePostSubmit(event)" class="space-y-3 text-xs">
           <div>
             <label class="block text-slate-300 font-bold mb-1">Tên giày & phối màu *</label>
-            <input id="postName" required type="text" placeholder="VD: Giày thể thao Wika Netic ĐỎ"
+            <input id="postName" required type="text" placeholder="VD: Giày Tennis/Pickleball Prince Rule The Court Đen Trắng"
               class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
           </div>
 
@@ -233,7 +233,7 @@
           </p>
 
           <div>
-            <label class="block text-slate-300 font-bold mb-1">Ảnh thực tế (Tối đa 2 ảnh)</label>
+            <label class="block text-slate-300 font-bold mb-1">Ảnh thực tế (Tối đa 2 ảnh • Tự nén nét ~600px)</label>
             <div class="grid grid-cols-2 gap-2.5">
               <label class="relative h-28 rounded-xl border border-dashed border-slate-700 bg-slate-800/60 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 overflow-hidden">
                 <input type="file" accept="image/*" onchange="handleImageCompress(event, 1)" class="hidden" />
@@ -248,7 +248,7 @@
                 <input type="file" accept="image/*" onchange="handleImageCompress(event, 2)" class="hidden" />
                 <div id="placeholder2" class="text-center text-slate-400 space-y-1">
                   <i class="fa-solid fa-shoe-prints text-lg text-orange-400"></i>
-                  <p class="text-[10px] font-semibold">Ảnh 2 (Đế / Tem)</p>
+                  <p class="text-[10px] font-semibold">Ảnh 2 (Đế / Keo / Tem)</p>
                 </div>
                 <img id="prevPhoto2" class="hidden w-full h-full object-cover" />
               </label>
@@ -1013,7 +1013,7 @@
       grid.innerHTML = visibleProducts.map(p => {
         const isReserved = p.status === 'negotiating';
         const isSold = p.status === 'sold';
-        const img = p.photo1 || 'https://placehold.co/400x300/1e293b/94a3b8?text=GIAY+LUOT+BMT';
+        const img = p.photo1 || 'https://placehold.co/600x450/1e293b/94a3b8?text=GIAY+LUOT+BMT';
         let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow">Đang bán</span>`;
         if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
         else if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
@@ -1051,7 +1051,7 @@
       const modal = document.getElementById('detailModal');
       const mainImg = document.getElementById('modalMainImg');
       const thumbBox = document.getElementById('modalThumbnails');
-      mainImg.src = p.photo1 || 'https://placehold.co/400x300/1e293b/94a3b8?text=GIAY+LUOT+BMT';
+      mainImg.src = p.photo1 || 'https://placehold.co/600x450/1e293b/94a3b8?text=GIAY+LUOT+BMT';
       thumbBox.innerHTML = '';
       if (p.photo1) thumbBox.innerHTML += `<img src="${p.photo1}" onclick="document.getElementById('modalMainImg').src='${p.photo1}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
       if (p.photo2) thumbBox.innerHTML += `<img src="${p.photo2}" onclick="document.getElementById('modalMainImg').src='${p.photo2}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
@@ -1335,7 +1335,7 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           let width = img.width, height = img.height;
-          const MAX_WIDTH = 380;
+          const MAX_WIDTH = 600;
           if (width > MAX_WIDTH) {
             height = Math.round((height * MAX_WIDTH) / width);
             width = MAX_WIDTH;
@@ -1343,7 +1343,7 @@
           canvas.width = width;
           canvas.height = height;
           canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.68);
           if (slot === 1) {
             tempPhoto1 = compressedDataUrl;
             document.getElementById('prevPhoto1').src = compressedDataUrl;
@@ -1598,7 +1598,7 @@
         const isMyPost = normalizePhone(p.sellerPhone) === myPhoneNorm;
         return `
           <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 p-3 rounded-2xl border border-slate-800 flex items-center gap-3 cursor-pointer hover:border-orange-500/70 transition shadow-md">
-            <img src="${p.photo1 || 'https://placehold.co/100x100/1e293b/94a3b8?text=GIAY'}" class="w-16 h-16 rounded-xl object-cover">
+            <img src="${p.photo1 || 'https://placehold.co/150x150/1e293b/94a3b8?text=GIAY'}" class="w-16 h-16 rounded-xl object-cover">
             <div class="flex-grow space-y-1 text-xs">
               <div class="flex items-center justify-between">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isMyPost ? 'bg-orange-500/20 text-orange-300' : 'bg-sky-500/20 text-sky-300'}">${isMyPost ? 'Tin của tôi' : 'Đang giữ chỗ'}</span>
