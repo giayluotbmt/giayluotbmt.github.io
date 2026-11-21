@@ -61,32 +61,40 @@
     </div>
 
     <!-- NAVIGATION TABS -->
-    <div class="max-w-5xl mx-auto px-3.5 flex items-center gap-1 overflow-x-auto border-t border-slate-800/80 text-xs font-bold">
+    <div class="max-w-5xl mx-auto px-3.5 py-1 flex items-center gap-1.5 overflow-x-auto border-t border-slate-800/80 text-xs font-bold">
       <button id="tab-market" onclick="switchTab('market')"
-        class="px-3 py-2.5 border-b-2 border-orange-500 text-orange-400 whitespace-nowrap flex items-center gap-1.5">
+        class="px-3 py-2 border-b-2 border-orange-500 text-orange-400 whitespace-nowrap flex items-center gap-1.5">
         <i class="fa-solid fa-store"></i> Sàn Giày
         <span id="badgeMarketCount" class="px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[10px]">0</span>
       </button>
 
+      <!-- NÚT ĐẤU GIÁ 12H NỔI BẬT TRÊN THANH CÔNG CỤ -->
+      <button id="tab-auction" onclick="switchTab('auction')"
+        class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 whitespace-nowrap flex items-center gap-1.5 shadow-sm shadow-amber-500/10 transition">
+        <span>🔨</span>
+        <span>ĐẤU GIÁ 12H</span>
+        <span id="badgeAuctionCount" class="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px]">0</span>
+      </button>
+
       <button id="tab-post" onclick="switchTab('post')"
-        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
-        <i class="fa-solid fa-plus-circle text-emerald-400"></i> Đăng Pass Giày
+        class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        <i class="fa-solid fa-plus-circle text-emerald-400"></i> Đăng Bán Giày
       </button>
 
       <button id="tab-alerts" onclick="switchTab('alerts')"
-        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
         <i class="fa-solid fa-bell text-amber-400"></i> Săn Size
         <span id="badgeAlertsCount" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px]">0</span>
       </button>
 
       <button id="tab-my-shoes" onclick="switchTab('my-shoes')"
-        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
         <i class="fa-solid fa-bag-shopping text-sky-400"></i> Tin Của Tôi
         <span id="badgeMyCount" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px]">0</span>
       </button>
 
       <button id="tab-admin" onclick="switchTab('admin')"
-        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5 ml-auto">
+        class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5 ml-auto">
         <i class="fa-solid fa-user-shield text-rose-400"></i> Quản Trị
       </button>
     </div>
@@ -103,6 +111,31 @@
 
   <!-- MAIN CONTENT -->
   <main class="max-w-5xl mx-auto px-3.5 py-4 pb-16">
+
+    <!-- ==================== ĐẤU GIÁ 12H ==================== -->
+    <section id="sec-auction" class="hidden space-y-3.5">
+      <div class="bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-amber-500/15 border border-amber-500/35 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black uppercase">KÈO ĐẤU GIÁ RIÊNG</span>
+            <h2 class="text-sm sm:text-base font-extrabold text-amber-300">🔨 ĐẤU GIÁ 12 GIỜ</h2>
+          </div>
+          <p class="text-xs text-slate-300">Kèo đấu giá nổi bật tách riêng khỏi tin bán thường để không bị trôi • Bước giá mặc định <strong>+10.000đ</strong> mỗi lượt.</p>
+        </div>
+        <button id="btnQuickCreateAuction" type="button" onclick="openQuickAuctionForm()"
+          class="hidden px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs whitespace-nowrap transition shadow">
+          <i class="fa-solid fa-gavel mr-1"></i> + Đăng Kèo Đấu Giá 12h
+        </button>
+      </div>
+
+      <div id="auctionEmptyState" class="hidden text-center py-12 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+        <i class="fa-solid fa-gavel text-3xl text-amber-400/70"></i>
+        <p class="text-sm font-bold text-slate-200">Hiện chưa có phiên Đấu Giá 12h nào đang mở</p>
+        <p class="text-xs text-slate-400">Theo dõi mục này hoặc quay lại Sàn Giày để xem các đôi đang bán.</p>
+      </div>
+
+      <div id="auctionGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
 
     <!-- ==================== SÀN GIÀY ==================== -->
     <section id="sec-market" class="space-y-3.5">
@@ -124,6 +157,7 @@
           <select id="statusFilter" onchange="renderMarket()"
             class="bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-orange-500">
             <option value="ALL">Tất cả đang mở</option>
+            <option value="auction">🔨 Đấu giá 12h</option>
             <option value="available">Đang bán</option>
             <option value="negotiating">Đang giữ chỗ 90p</option>
             <option value="sold">Đã bán</option>
@@ -160,13 +194,13 @@
       <div id="emptyState" class="hidden text-center py-12 bg-slate-900 rounded-2xl border border-slate-800 space-y-2.5">
         <i class="fa-solid fa-box-open text-3xl text-slate-500"></i>
         <p class="text-sm font-bold text-slate-200">Chưa có đôi giày nào khớp bộ lọc</p>
-        <p class="text-xs text-slate-400">Thử đổi khu vực/size hoặc đăng pass giày mới lên sàn ngay!</p>
+        <p class="text-xs text-slate-400">Thử đổi khu vực/size hoặc đăng bán giày mới lên sàn ngay!</p>
         <div class="flex items-center justify-center gap-2 pt-1">
           <button onclick="resetAllFilters()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition">
             Xóa bộ lọc
           </button>
           <button onclick="openPostTabGuarded()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-extrabold transition">
-            <i class="fa-solid fa-plus-circle mr-1"></i> Đăng Pass Giày Ngay
+            <i class="fa-solid fa-plus-circle mr-1"></i> Đăng Bán Giày Ngay
           </button>
         </div>
       </div>
@@ -174,12 +208,12 @@
       <div id="marketGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- ==================== ĐĂNG PASS ==================== -->
+    <!-- ==================== ĐĂNG BÁN GIÀY ==================== -->
     <section id="sec-post" class="hidden max-w-xl mx-auto">
       <div class="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-lg space-y-4">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-base font-extrabold text-white">ĐĂNG PASS GIÀY LƯỚT</h2>
+            <h2 class="text-base font-extrabold text-white">ĐĂNG BÁN GIÀY</h2>
             <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
           </div>
           <a href="tel:0906075077" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-orange-400 hover:bg-slate-700">
@@ -190,7 +224,7 @@
         <form id="postForm" onsubmit="handlePostSubmit(event)" class="space-y-3 text-xs">
           <div>
             <label class="block text-slate-300 font-bold mb-1">Tên giày & phối màu *</label>
-            <input id="postName" required type="text" placeholder="VD: Giày Tennis/Pickleball Prince Rule The Court Đen Trắng"
+            <input id="postName" required type="text" placeholder="VD: Giày Prince mới 100% / Giày Tennis/Pickleball"
               class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
           </div>
 
@@ -215,20 +249,45 @@
 
           <div class="grid grid-cols-2 gap-2.5">
             <div>
-              <label class="block text-slate-300 font-bold mb-1">Giá pass (VNĐ) *</label>
-              <input id="postPrice" required type="number" min="10000" step="1000" placeholder="VD: 390000"
+              <label id="postPriceLabel" class="block text-slate-300 font-bold mb-1">Giá bán (VNĐ) *</label>
+              <input id="postPrice" required type="number" min="10000" step="1000" placeholder="VD: 1800000"
+                oninput="updateAdminAuctionPreview()"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
 
             <div>
               <label class="block text-slate-300 font-bold mb-1">Tình trạng *</label>
               <select id="postCondition" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500">
+                <option value="Mới 100% - Fullbox">Mới 100% - Fullbox</option>
                 <option value="99% - Lướt nhẹ">99% - Lướt nhẹ</option>
                 <option value="98% - Như mới">98% - Như mới</option>
                 <option value="95% - Đế đẹp">95% - Đế đẹp</option>
                 <option value="90% - Đã sử dụng">90% - Đã sử dụng</option>
                 <option value="85% - Cày sân tốt">85% - Cày sân tốt</option>
               </select>
+            </div>
+          </div>
+
+          <!-- KHỐI ĐẤU GIÁ 12H CHỈ MỞ CHO QUẢN TRỊ -->
+          <div id="adminAuctionBox" class="hidden bg-amber-500/10 border border-amber-500/35 rounded-2xl p-3 space-y-2.5">
+            <label class="flex items-center gap-2 font-extrabold text-amber-300 cursor-pointer">
+              <input id="postIsAuction" type="checkbox" onchange="toggleAuctionFields()" class="rounded accent-amber-500" />
+              <span>🔨 Bật Đấu Giá 12 Giờ (Chỉ dành cho Quản Trị — tự đặt giá khởi điểm cụ thể)</span>
+            </label>
+
+            <div id="auctionOptionsRow" class="hidden grid grid-cols-2 gap-2 pt-1">
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Giá bán lẻ tham khảo (tùy chọn):</label>
+                <input id="postRetailRef" type="number" min="0" step="1000" placeholder="VD: 2200000"
+                  oninput="updateAdminAuctionPreview()"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100" />
+              </div>
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Bước giá mỗi lượt (VNĐ):</label>
+                <input id="postBidStep" type="number" min="5000" step="5000" value="10000"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100" />
+              </div>
+              <p id="auctionStartPreview" class="col-span-2 text-[11px] text-amber-200 font-semibold"></p>
             </div>
           </div>
 
@@ -283,7 +342,7 @@
 
           <button id="btnSubmitPost" type="submit"
             class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wide shadow-md transition">
-            <i class="fa-solid fa-paper-plane mr-1"></i> Đăng Pass Lên Sàn
+            <i class="fa-solid fa-paper-plane mr-1"></i> Đăng Bán Lên Sàn
           </button>
         </form>
       </div>
@@ -346,7 +405,7 @@
             </button>
             <button onclick="switchTab('post')"
               class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold transition">
-              Đăng Pass Nhanh
+              Đăng Bán Nhanh
             </button>
           </div>
         </div>
@@ -485,7 +544,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL: DETAIL & 90-MIN LOCK ==================== -->
+  <!-- ==================== MODAL: DETAIL & 90-MIN LOCK / 12H AUCTION ==================== -->
   <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-auto">
       <div class="relative h-64 bg-slate-800">
@@ -506,7 +565,10 @@
             <span id="modalCat" class="text-[10px] font-extrabold uppercase text-orange-400"></span>
             <h3 id="modalTitle" class="text-base font-extrabold text-white"></h3>
           </div>
-          <span id="modalPrice" class="text-lg font-black text-orange-400 whitespace-nowrap"></span>
+          <div class="text-right">
+            <span id="modalRetailStrike" class="hidden block text-[11px] line-through text-slate-500"></span>
+            <span id="modalPrice" class="text-lg font-black text-orange-400 whitespace-nowrap"></span>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2 bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700/80 text-[11px]">
@@ -517,6 +579,31 @@
         </div>
 
         <p id="modalNote" class="text-slate-300 bg-slate-800/50 p-2.5 rounded-xl border border-slate-800"></p>
+
+        <!-- KHỐI ĐẤU GIÁ 12H -->
+        <div id="modalAuctionBox" class="hidden bg-amber-500/12 border border-amber-500/35 p-3 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between text-[11px]">
+            <span id="modalAuctionDiscountTag" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold"></span>
+            <span id="modalAuctionTimer" class="font-extrabold text-amber-300"></span>
+          </div>
+          <p class="text-[11px] text-slate-300">
+            Giá cao nhất hiện tại: <strong id="modalTopBidText" class="text-amber-400 text-sm"></strong>
+            • Bước giá: <strong id="modalBidStepText" class="text-white"></strong>
+          </p>
+          <p class="text-[11px] text-slate-400">
+            Khách đang dẫn đầu: <strong id="modalTopBidderText" class="text-slate-200"></strong>
+          </p>
+          <div id="modalBidControls" class="flex gap-2 pt-1">
+            <button id="btnBidMin" type="button" onclick="submitAuctionBid(0)"
+              class="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold transition"></button>
+            <button id="btnBidPlus" type="button" onclick="submitAuctionBid(1)"
+              class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 font-bold transition"></button>
+          </div>
+          <button id="btnCloseAuctionWinner" type="button" onclick="closeAuctionWinner()"
+            class="hidden w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold transition">
+            Chốt Giá Thắng Cho Khách Dẫn Đầu
+          </button>
+        </div>
 
         <div id="modalTimerBox" class="hidden bg-amber-500/15 border border-amber-500/40 p-3 rounded-2xl text-amber-200 space-y-1">
           <p class="font-extrabold text-amber-400"><i class="fa-solid fa-hourglass-half mr-1"></i> ĐANG GIỮ CHỖ 90 PHÚT</p>
@@ -661,6 +748,7 @@
     let activePhone = localStorage.getItem('giayluot_user_phone') || "";
 
     let products = [];
+    let auctionsMap = JSON.parse(localStorage.getItem('giayluot_auctions_meta_v1') || '{}');
     let alerts = [];
     let deletedAlertKeys = [];
     let deletedProductIds = [];
@@ -680,6 +768,61 @@
     // ==================== ĐO CHÂN CHỌN SIZE CHUẨN ====================
     let sgMode = 'cm';
     let sgRecommendedSize = '41';
+
+    function saveAuctionsMap() {
+      localStorage.setItem('giayluot_auctions_meta_v1', JSON.stringify(auctionsMap));
+    }
+
+    function getAuctionMeta(productId) {
+      return auctionsMap[String(productId)] || null;
+    }
+
+    function openQuickAuctionForm() {
+      switchTab('post');
+      if (isAdminSession()) {
+        const cb = document.getElementById('postIsAuction');
+        if (cb) {
+          cb.checked = true;
+          toggleAuctionFields();
+        }
+      }
+    }
+
+    function toggleAuctionFields() {
+      const checked = document.getElementById('postIsAuction')?.checked;
+      document.getElementById('auctionOptionsRow')?.classList.toggle('hidden', !checked);
+      document.getElementById('postPriceLabel').innerText = checked ? "Giá khởi điểm đấu giá (VNĐ) *" : "Giá bán (VNĐ) *";
+      updateAdminAuctionPreview();
+    }
+
+    function updateAdminAuctionPreview() {
+      const checked = document.getElementById('postIsAuction')?.checked;
+      const preview = document.getElementById('auctionStartPreview');
+      if (!checked || !preview) return;
+      const startPrice = Number(document.getElementById('postPrice')?.value || 0);
+      const retailRef = Number(document.getElementById('postRetailRef')?.value || 0);
+      if (startPrice > 0 && retailRef > startPrice) {
+        const diffPct = Math.round(((retailRef - startPrice) / retailRef) * 100);
+        preview.innerText = `Khởi điểm ${formatVND(startPrice)} • Thấp hơn giá bán lẻ ${formatVND(retailRef)} khoảng ${diffPct}% • Mở trong 12h.`;
+      } else if (startPrice > 0) {
+        preview.innerText = `Giá khởi điểm phiên 12h: ${formatVND(startPrice)}.`;
+      } else {
+        preview.innerText = "Nhập số tiền khởi điểm cụ thể (VD: 1800000) và bước giá (mặc định +10.000đ).";
+      }
+    }
+
+    function syncAdminAuctionUI() {
+      const isAdmin = isAdminSession();
+      const box = document.getElementById('adminAuctionBox');
+      if (box) box.classList.toggle('hidden', !isAdmin);
+      const quickBtn = document.getElementById('btnQuickCreateAuction');
+      if (quickBtn) quickBtn.classList.toggle('hidden', !isAdmin);
+      if (!isAdmin) {
+        const cb = document.getElementById('postIsAuction');
+        if (cb) cb.checked = false;
+        toggleAuctionFields();
+      }
+    }
 
     function openSizeGuideModal() {
       if (selectedCategory && selectedCategory !== 'ALL') {
@@ -958,7 +1101,9 @@
         }
       }
       loadLocalCache();
+      syncAdminAuctionUI();
       renderMarket();
+      renderAuctionTab();
       renderAlerts();
       renderMyShoes();
       checkAdminLock();
@@ -971,6 +1116,10 @@
 
       setInterval(() => syncWithCloud(false), 45000);
       setInterval(checkExpiredLocks, 10000);
+      setInterval(() => {
+        renderMarket();
+        renderAuctionTab();
+      }, 1000);
     };
 
     function normalizePhone(phone) {
@@ -1003,10 +1152,12 @@
       if (activePhone && !isAdminSession()) {
         document.getElementById('postSellerPhone').value = activePhone;
       }
+      syncAdminAuctionUI();
       checkAdminLock();
       checkFormBanWarning('post');
       checkFormBanWarning('alert');
       renderMarket();
+      renderAuctionTab();
       renderMyShoes();
       renderAlerts();
       if (currentDetailId && !document.getElementById('detailModal').classList.contains('hidden')) {
@@ -1021,7 +1172,7 @@
       if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
         return;
       }
-      alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên!' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
+      alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên! Bạn đã có thể bật Đấu Giá 12h khi đăng bán.' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
     }
 
     function loadLocalCache() {
@@ -1069,10 +1220,14 @@
         }
       }
 
-      ['market', 'post', 'alerts', 'my-shoes', 'admin'].forEach(t => {
+      ['market', 'auction', 'post', 'alerts', 'my-shoes', 'admin'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
-        if (btn) {
+        if (!btn) return;
+        if (t === 'auction') {
+          btn.classList.remove('ring-2', 'ring-amber-300', 'bg-amber-400', 'text-slate-950');
+          btn.classList.add('bg-amber-500/20', 'text-amber-300');
+        } else {
           btn.classList.remove('border-orange-500', 'text-orange-400');
           btn.classList.add('border-transparent', 'text-slate-400');
         }
@@ -1081,10 +1236,20 @@
       document.getElementById(`sec-${tabId}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`tab-${tabId}`);
       if (activeBtn) {
-        activeBtn.classList.remove('border-transparent', 'text-slate-400');
-        activeBtn.classList.add('border-orange-500', 'text-orange-400');
+        if (tabId === 'auction') {
+          activeBtn.classList.remove('bg-amber-500/20', 'text-amber-300');
+          activeBtn.classList.add('ring-2', 'ring-amber-300', 'bg-amber-400', 'text-slate-950');
+        } else {
+          activeBtn.classList.remove('border-transparent', 'text-slate-400');
+          activeBtn.classList.add('border-orange-500', 'text-orange-400');
+        }
       }
 
+      if (tabId === 'post') syncAdminAuctionUI();
+      if (tabId === 'auction') {
+        syncAdminAuctionUI();
+        renderAuctionTab();
+      }
       if (tabId === 'market') renderMarket();
       if (tabId === 'alerts') renderAlerts();
       if (tabId === 'my-shoes') renderMyShoes();
@@ -1171,6 +1336,7 @@
           checkFormBanWarning('post');
           checkFormBanWarning('alert');
           renderMarket();
+          renderAuctionTab();
           renderAlerts();
           renderMyShoes();
           renderAdminData();
@@ -1237,8 +1403,86 @@
       if (updated) {
         saveLocalCache();
         renderMarket();
+        renderAuctionTab();
         renderMyShoes();
       }
+    }
+
+    function formatAuctionCountdown(ms) {
+      if (ms <= 0) return "Đã hết 12h";
+      const totalSec = Math.floor(ms / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      return `${String(h).padStart(2, '0')}h:${String(m).padStart(2, '0')}m:${String(s).padStart(2, '0')}s`;
+    }
+
+    function buildShoeCardHtml(p) {
+      const auc = getAuctionMeta(p.id);
+      const isReserved = p.status === 'negotiating';
+      const isSold = p.status === 'sold';
+      const img = p.photo1 || 'https://placehold.co/600x450/1e293b/94a3b8?text=GIAY+LUOT+BMT';
+      let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow">Đang bán</span>`;
+      if (auc) {
+        const leftMs = auc.endsAt - Date.now();
+        statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-400 text-slate-950 shadow">🔨 12h • ${formatAuctionCountdown(leftMs)}</span>`;
+      } else if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
+      else if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
+
+      const displayPrice = auc ? (auc.currentBid || p.price) : p.price;
+      const priceLabel = auc ? `Giá đấu cao nhất (+${formatVND(auc.bidStep || 10000)})` : `Giá bán`;
+
+      return `
+        <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border ${auc ? 'border-amber-500/40' : 'border-slate-800'} overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+          <div class="relative w-full h-48 bg-slate-800 overflow-hidden">
+            <img src="${img}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            <div class="absolute top-2.5 left-2.5">${statusBadge}</div>
+            <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-950/90 border border-slate-700 text-white">EU ${escapeHtml(p.size)}</span>
+          </div>
+          <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+            <div>
+              <p class="text-[10px] font-extrabold uppercase tracking-wider ${auc ? 'text-amber-400' : 'text-orange-400'}">${escapeHtml(p.category)}</p>
+              <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${escapeHtml(p.location)} • ${escapeHtml(p.condition)}</p>
+            </div>
+            <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="block text-[10px] text-slate-500">${priceLabel}</span>
+                <span class="text-sm font-black ${auc ? 'text-amber-400' : 'text-orange-400'}">${formatVND(displayPrice)}</span>
+              </div>
+              <span class="text-xs font-bold text-slate-400 group-hover:text-orange-400">${auc ? 'Trả giá →' : 'Xem tin →'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAuctionTab() {
+      const grid = document.getElementById('auctionGrid');
+      const empty = document.getElementById('auctionEmptyState');
+      const deletedSet = new Set(deletedProductIds.map(id => String(id)));
+
+      const activeAuctions = products.filter(p =>
+        p.status !== 'banned' &&
+        p.status !== 'deleted' &&
+        p.status !== 'sold' &&
+        !deletedSet.has(String(p.id)) &&
+        !isPhoneBanned(p.sellerPhone) &&
+        Boolean(getAuctionMeta(p.id))
+      );
+
+      const badge = document.getElementById('badgeAuctionCount');
+      if (badge) badge.innerText = activeAuctions.length;
+
+      if (!grid || !empty) return;
+      if (activeAuctions.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+      grid.innerHTML = activeAuctions.map(buildShoeCardHtml).join('');
     }
 
     function setCategoryFilter(cat) {
@@ -1348,7 +1592,9 @@
       const statusBaseProducts = products.filter(p => {
         if (p.status === 'banned' || p.status === 'deleted' || deletedSet.has(String(p.id))) return false;
         if (isPhoneBanned(p.sellerPhone)) return false;
+        const auc = getAuctionMeta(p.id);
         if (statusFilter === 'ALL' && p.status === 'sold') return false;
+        if (statusFilter === 'auction' && !auc) return false;
         if (statusFilter === 'available' && p.status !== 'available') return false;
         if (statusFilter === 'negotiating' && p.status !== 'negotiating') return false;
         if (statusFilter === 'sold' && p.status !== 'sold') return false;
@@ -1379,38 +1625,7 @@
       }
 
       emptyState.classList.add('hidden');
-      grid.innerHTML = visibleProducts.map(p => {
-        const isReserved = p.status === 'negotiating';
-        const isSold = p.status === 'sold';
-        const img = p.photo1 || 'https://placehold.co/600x450/1e293b/94a3b8?text=GIAY+LUOT+BMT';
-        let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow">Đang bán</span>`;
-        if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
-        else if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
-
-        return `
-          <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
-            <div class="relative w-full h-48 bg-slate-800 overflow-hidden">
-              <img src="${img}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-              <div class="absolute top-2.5 left-2.5">${statusBadge}</div>
-              <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-950/90 border border-slate-700 text-white">EU ${escapeHtml(p.size)}</span>
-            </div>
-            <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
-              <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">${escapeHtml(p.category)}</p>
-                <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${escapeHtml(p.location)} • ${escapeHtml(p.condition)}</p>
-              </div>
-              <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between">
-                <div>
-                  <span class="block text-[10px] text-slate-500">Giá pass</span>
-                  <span class="text-sm font-black text-orange-400">${formatVND(p.price)}</span>
-                </div>
-                <span class="text-xs font-bold text-slate-400 group-hover:text-orange-400">Xem tin →</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      grid.innerHTML = visibleProducts.map(buildShoeCardHtml).join('');
     }
 
     function openDetailModal(id) {
@@ -1431,8 +1646,8 @@
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
       const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
+      const auc = getAuctionMeta(p.id);
 
-      // Chỉ mở SĐT/Zalo đầy đủ khi đồng thời có SĐT đã lưu AND đã giữ chỗ đôi này (hoặc chủ tin/admin)
       const canUnlockContact = Boolean(
         isAdmin ||
         isSeller ||
@@ -1441,7 +1656,6 @@
 
       document.getElementById('modalCat').innerText = p.category;
       document.getElementById('modalTitle').innerText = p.title;
-      document.getElementById('modalPrice').innerText = formatVND(p.price);
       document.getElementById('modalSize').innerText = p.size;
       document.getElementById('modalCond').innerText = p.condition;
       document.getElementById('modalLoc').innerText = p.location;
@@ -1450,8 +1664,21 @@
         : maskPhoneNumber(p.sellerPhone);
       document.getElementById('modalNote').innerText = p.description ? `Ghi chú: ${p.description}` : 'Không có ghi chú thêm.';
 
+      const retailStrike = document.getElementById('modalRetailStrike');
+      if (auc && Number(auc.retailPrice || 0) > 0) {
+        retailStrike.classList.remove('hidden');
+        retailStrike.innerText = `Giá lẻ tham khảo: ${formatVND(auc.retailPrice)}`;
+        document.getElementById('modalPrice').innerText = formatVND(auc.currentBid || p.price);
+      } else {
+        retailStrike.classList.add('hidden');
+        document.getElementById('modalPrice').innerText = formatVND(p.price);
+      }
+
       const statusBadge = document.getElementById('modalStatusBadge');
-      if (isReserved) {
+      if (auc) {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-400 text-slate-950 shadow";
+        statusBadge.innerText = `Đấu giá 12h (+${formatVND(auc.bidStep || 10000)})`;
+      } else if (isReserved) {
         statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500 text-white shadow";
         statusBadge.innerText = "Giữ chỗ 90 phút";
       } else if (p.status === 'sold') {
@@ -1462,11 +1689,39 @@
         statusBadge.innerText = "Đang bán";
       }
 
+      const aucBox = document.getElementById('modalAuctionBox');
+      if (auc) {
+        aucBox.classList.remove('hidden');
+        const leftMs = auc.endsAt - Date.now();
+        const ended = leftMs <= 0;
+        const step = Number(auc.bidStep || 10000);
+        const cur = Number(auc.currentBid || p.price);
+        const minBid = cur + step;
+
+        document.getElementById('modalAuctionDiscountTag').innerText = `Khởi điểm: ${formatVND(auc.startPrice || p.price)}`;
+        document.getElementById('modalAuctionTimer').innerText = ended ? 'Đã kết thúc phiên 12h' : `Còn ${formatAuctionCountdown(leftMs)}`;
+        document.getElementById('modalTopBidText').innerText = formatVND(cur);
+        document.getElementById('modalBidStepText').innerText = `+${formatVND(step)}`;
+        document.getElementById('modalTopBidderText').innerText = auc.topBidder
+          ? (isAdmin || normalizePhone(auc.topBidder) === viewerNorm ? auc.topBidder : maskPhoneNumber(auc.topBidder))
+          : 'Chưa có người trả giá';
+
+        const bidControls = document.getElementById('modalBidControls');
+        bidControls.classList.toggle('hidden', ended || p.status === 'sold');
+        document.getElementById('btnBidMin').innerText = `Trả ${formatVND(minBid)}`;
+        document.getElementById('btnBidPlus').innerText = `+${formatVND(step + 20000)}`;
+
+        const closeBtn = document.getElementById('btnCloseAuctionWinner');
+        closeBtn.classList.toggle('hidden', !(isAdmin && auc.topBidder && p.status !== 'sold'));
+      } else {
+        aucBox.classList.add('hidden');
+      }
+
       const hintEl = document.getElementById('contactUnlockHint');
       if (hintEl) {
         if (canUnlockContact) {
           hintEl.className = "text-[11px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-3 py-2";
-          hintEl.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> Đã mở liên hệ người bán. Vui lòng chốt giao dịch & chuyển 10% phí sàn về SHB <strong>7772345999</strong> khi bán thành công.`;
+          hintEl.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> Đã mở liên hệ người bán. Hai bên tự thương lượng & tự thanh toán, chốt xong chuyển 10% phí sàn về SHB <strong>7772345999</strong>.`;
         } else if (!hasLoggedInPhone) {
           hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
           hintEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1"></i> Số người bán đang ẩn. Nhập SĐT của bạn ở thanh trên và bấm <strong>Giữ Chỗ 90 Phút</strong> để hiện Gọi Điện / Zalo.`;
@@ -1511,7 +1766,7 @@
         startCountdown(p.lockedUntil);
       } else {
         timerBox.classList.add('hidden');
-        reserveBtn.classList.toggle('hidden', p.status === 'sold');
+        reserveBtn.classList.toggle('hidden', p.status === 'sold' || Boolean(auc));
         if (timerInterval) clearInterval(timerInterval);
       }
 
@@ -1524,6 +1779,75 @@
 
       document.getElementById('sellerAdminControls').classList.toggle('hidden', !(isSeller || isAdmin));
       modal.classList.remove('hidden');
+    }
+
+    function submitAuctionBid(extraStepMode) {
+      const p = products.find(x => x.id === currentDetailId);
+      const auc = p ? getAuctionMeta(p.id) : null;
+      if (!p || !auc) return;
+
+      if (Date.now() >= auc.endsAt) {
+        alert("Phiên đấu giá 12h đã kết thúc!");
+        return;
+      }
+
+      const blockedBefore = findAnyBannedPhone();
+      if (blockedBefore) {
+        alert(`SĐT ${blockedBefore} đang bị khóa trên sàn, không thể trả giá!`);
+        return;
+      }
+
+      let bidder = getCurrentViewerPhone();
+      if (!bidder || bidder === ADMIN_CODE) {
+        const raw = prompt("Nhập SĐT của bạn để tham gia trả giá:");
+        if (!raw) return;
+        const norm = normalizePhone(raw);
+        if (!norm || norm === ADMIN_CODE) {
+          alert("Vui lòng nhập số điện thoại hợp lệ!");
+          return;
+        }
+        if (isPhoneBanned(norm)) {
+          alert(`SĐT ${norm} đang bị khóa trên sàn, không thể trả giá!`);
+          return;
+        }
+        document.getElementById('userPhoneInput').value = norm;
+        updateUserPhone(norm);
+        bidder = norm;
+      }
+
+      const step = Number(auc.bidStep || 10000);
+      const currentTop = Number(auc.currentBid || p.price);
+      const newBid = extraStepMode === 1 ? (currentTop + step + 20000) : (currentTop + step);
+
+      auc.currentBid = newBid;
+      auc.topBidder = bidder;
+      p.price = newBid;
+      saveAuctionsMap();
+      saveLocalCache();
+      renderMarket();
+      renderAuctionTab();
+      openDetailModal(p.id);
+      alert(`Đã ghi nhận mức trả giá ${formatVND(newBid)} cho SĐT ${bidder}!`);
+    }
+
+    function closeAuctionWinner() {
+      if (!isAdminSession()) return;
+      const p = products.find(x => x.id === currentDetailId);
+      const auc = p ? getAuctionMeta(p.id) : null;
+      if (!p || !auc || !auc.topBidder) return;
+
+      p.buyerPhone = auc.topBidder;
+      p.price = auc.currentBid;
+      p.status = 'negotiating';
+      p.lockedUntil = Date.now() + (90 * 60 * 1000);
+      delete auctionsMap[String(p.id)];
+      saveAuctionsMap();
+      saveLocalCache();
+      renderMarket();
+      renderAuctionTab();
+      renderMyShoes();
+      openDetailModal(p.id);
+      alert(`Đã chốt thắng đấu giá cho SĐT ${auc.topBidder} ở mức ${formatVND(p.price)} và mở giữ chỗ 90 phút!`);
     }
 
     function handleContactAction(type) {
@@ -1624,6 +1948,7 @@
       p.buyerPhone = buyerPhone;
       saveLocalCache();
       renderMarket();
+      renderAuctionTab();
       renderMyShoes();
       openDetailModal(p.id);
 
@@ -1670,12 +1995,15 @@
         if (deleteAfterSold) {
           if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
           products = products.filter(x => String(x.id) !== targetId);
+          delete auctionsMap[targetId];
+          saveAuctionsMap();
         } else {
           p.status = 'sold';
         }
 
         saveLocalCache();
         renderMarket();
+        renderAuctionTab();
         renderMyShoes();
 
         await postToCloud({
@@ -1733,10 +2061,13 @@
       const targetId = String(p.id);
       if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
       products = products.filter(x => String(x.id) !== targetId);
+      delete auctionsMap[targetId];
+      saveAuctionsMap();
 
       saveLocalCache();
       closeDetailModal();
       renderMarket();
+      renderAuctionTab();
       renderMyShoes();
 
       await postToCloud({
@@ -1758,6 +2089,7 @@
       saveLocalCache();
       openDetailModal(p.id);
       renderMarket();
+      renderAuctionTab();
       await postToCloud({ action: 'UPDATE_STATUS', productId: p.id, newStatus: 'available' });
     }
 
@@ -1815,12 +2147,30 @@
       const btn = document.getElementById('btnSubmitPost');
       if (btn) { btn.disabled = true; btn.innerText = "Đang gửi lên Google Sheets..."; }
 
+      const startPrice = Number(document.getElementById('postPrice').value);
+      const isAuction = Boolean(isAdminSession() && document.getElementById('postIsAuction')?.checked);
+      const retailRef = Number(document.getElementById('postRetailRef')?.value || 0);
+      const bidStep = Math.max(5000, Number(document.getElementById('postBidStep')?.value || 10000));
+
+      const productId = "BMT-" + Date.now();
+      if (isAuction) {
+        auctionsMap[productId] = {
+          startPrice: startPrice,
+          retailPrice: retailRef > 0 ? retailRef : 0,
+          currentBid: startPrice,
+          bidStep: bidStep,
+          topBidder: "",
+          endsAt: Date.now() + (12 * 3600 * 1000)
+        };
+        saveAuctionsMap();
+      }
+
       const newProduct = {
-        id: "BMT-" + Date.now(),
+        id: productId,
         title: document.getElementById('postName').value.trim(),
         category: document.getElementById('postCategory').value,
         size: document.getElementById('postSize').value.trim(),
-        price: Number(document.getElementById('postPrice').value),
+        price: startPrice,
         condition: document.getElementById('postCondition').value,
         location: document.getElementById('postLocation').value.trim(),
         sellerPhone: sellerPhone,
@@ -1845,9 +2195,13 @@
         }
       });
 
-      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Đăng Pass Lên Sàn'; }
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Đăng Bán Lên Sàn'; }
       document.getElementById('postForm').reset();
       document.getElementById('postLocation').value = "Buôn Ma Thuột";
+      document.getElementById('postBidStep').value = "10000";
+      const cb = document.getElementById('postIsAuction');
+      if (cb) cb.checked = false;
+      toggleAuctionFields();
       tempPhoto1 = ""; tempPhoto2 = "";
       document.getElementById('prevPhoto1').classList.add('hidden');
       document.getElementById('placeholder1').classList.remove('hidden');
@@ -1858,8 +2212,11 @@
         document.getElementById('userPhoneInput').value = sellerPhone;
         updateUserPhone(sellerPhone);
       }
-      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets!');
-      switchTab('market');
+      renderAuctionTab();
+      alert(isAuction
+        ? `Đã đăng phiên Đấu Giá 12h (khởi điểm ${formatVND(startPrice)}, bước giá +${formatVND(bidStep)})!`
+        : 'Đã đăng bán lên sàn và gửi đồng bộ Google Sheets!');
+      switchTab(isAuction ? 'auction' : 'market');
     }
 
     function getShareableBaseUrl() {
@@ -2062,6 +2419,7 @@
         badge.innerText = "LOCKED";
         badge.className = "px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[11px] font-bold";
       }
+      syncAdminAuctionUI();
     }
 
     function saveAdminScriptUrl() {
@@ -2082,6 +2440,7 @@
         saveLocalCache();
         renderAdminData();
         renderMarket();
+        renderAuctionTab();
         renderAlerts();
         checkFormBanWarning('post');
         checkFormBanWarning('alert');
@@ -2101,6 +2460,7 @@
       saveLocalCache();
       renderAdminData();
       renderMarket();
+      renderAuctionTab();
       renderAlerts();
       checkFormBanWarning('post');
       checkFormBanWarning('alert');
