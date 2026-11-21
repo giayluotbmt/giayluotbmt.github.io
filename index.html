@@ -32,6 +32,7 @@
         <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1">
           <i class="fa-solid fa-phone text-orange-400 text-xs mr-1.5"></i>
           <input id="userPhoneInput" type="text" placeholder="Nhập SĐT của bạn..."
+            onchange="updateUserPhone(this.value)"
             class="bg-transparent text-xs text-slate-100 placeholder-slate-400 focus:outline-none w-32" />
           <button onclick="savePhoneFromInput()"
             class="ml-1 px-2.5 py-0.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold transition">
@@ -222,9 +223,14 @@
             <div>
               <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán *</label>
               <input id="postSellerPhone" required type="tel" placeholder="09xxxxxxxx"
+                oninput="checkFormBanWarning('post')"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
           </div>
+
+          <p id="postBanWarning" class="hidden text-rose-400 font-bold bg-rose-500/10 border border-rose-500/30 rounded-xl px-3 py-2">
+            <i class="fa-solid fa-ban mr-1"></i> SĐT này đang bị khóa trên sàn, không thể đăng tin!
+          </p>
 
           <div>
             <label class="block text-slate-300 font-bold mb-1">Ảnh thực tế (Tối đa 2 ảnh)</label>
@@ -418,7 +424,7 @@
           </button>
         </div>
 
-        <div id="sellerAdminControls" class="hidden pt-2 border-t border-slate-800 grid grid-cols-2 gap-2">
+        <div id="sellerAdminControls" class="hidden pt-2 border-t border-slate-800 grid grid-cols-3 gap-2">
           <button onclick="confirmSoldAndCloseQR()"
             class="py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600 hover:text-white font-bold transition">
             <i class="fa-solid fa-check-circle mr-1"></i> Đã Bán
@@ -427,6 +433,11 @@
           <button onclick="triggerReopenProduct()"
             class="py-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500 hover:text-white font-bold transition">
             <i class="fa-solid fa-unlock mr-1"></i> Mở Bán Lại
+          </button>
+
+          <button id="btnDeleteProduct" onclick="triggerDeleteProduct()"
+            class="py-2 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 hover:bg-rose-600 hover:text-white font-bold transition">
+            <i class="fa-solid fa-trash-can mr-1"></i> Xóa Tin
           </button>
         </div>
       </div>
@@ -441,9 +452,15 @@
       <div class="bg-white p-3 rounded-2xl inline-block">
         <img id="vietQrImg" src="" class="w-48 h-48 mx-auto" />
       </div>
-      <div class="flex gap-2 pt-2 text-xs">
-        <button onclick="closeVietQrModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-bold">Đóng</button>
-        <button onclick="finishSoldProcess()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold">Xác Nhận Đã Bán</button>
+      <p class="text-[11px] text-slate-400">Sau khi chuyển khoản phí 10%, bạn có thể chọn xóa luôn tin khỏi sàn.</p>
+      <div class="flex flex-col gap-2 pt-1 text-xs">
+        <button onclick="finishSoldProcess(true)" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold transition">
+          <i class="fa-solid fa-check-double mr-1"></i> Đã Chuyển Phí & Xóa Tin Khỏi Sàn
+        </button>
+        <div class="flex gap-2">
+          <button onclick="closeVietQrModal()" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold">Đóng</button>
+          <button onclick="finishSoldProcess(false)" class="flex-1 py-2 rounded-xl bg-slate-800 border border-emerald-500/40 text-emerald-300 font-bold">Chỉ Đánh Dấu Đã Bán</button>
+        </div>
       </div>
     </div>
   </div>
@@ -457,8 +474,12 @@
       </div>
       <div>
         <label class="block text-slate-300 font-bold mb-1">Số điện thoại / Zalo *</label>
-        <input id="alertPhoneInput" type="tel" placeholder="09xxxxxxxx" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
+        <input id="alertPhoneInput" type="tel" placeholder="09xxxxxxxx" oninput="checkFormBanWarning('alert')"
+          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
       </div>
+      <p id="alertBanWarning" class="hidden text-rose-400 font-bold bg-rose-500/10 border border-rose-500/30 rounded-xl px-3 py-2">
+        <i class="fa-solid fa-ban mr-1"></i> SĐT này đang bị khóa trên sàn, không thể săn size!
+      </p>
       <div>
         <label class="block text-slate-300 font-bold mb-1">Bộ môn</label>
         <select id="alertCatInput" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100">
@@ -473,7 +494,7 @@
         <label class="block text-slate-300 font-bold mb-1">Size cần tìm *</label>
         <input id="alertSizeInput" type="text" placeholder="VD: 41" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
       </div>
-      <button onclick="submitAlertRegistration()" class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold">
+      <button id="btnSubmitAlert" onclick="submitAlertRegistration()" class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold">
         Lưu Yêu Cầu Săn Size
       </button>
     </div>
@@ -516,6 +537,7 @@
     let products = [];
     let alerts = [];
     let deletedAlertKeys = [];
+    let deletedProductIds = [];
     let blacklist = [];
     let logs = [];
 
@@ -528,8 +550,21 @@
     let currentDetailId = null;
     let timerInterval = null;
 
+    function extractBlacklistPhone(entry) {
+      if (!entry) return "";
+      if (typeof entry === "string" || typeof entry === "number") {
+        return normalizePhone(String(entry));
+      }
+      if (typeof entry === "object") {
+        return normalizePhone(entry.phone || entry.sdt || entry.number || "");
+      }
+      return "";
+    }
+
     function isAdminSession() {
-      return String(activePhone || "").replace(/\D/g, "") === ADMIN_CODE;
+      const topInput = String(document.getElementById('userPhoneInput')?.value || "").replace(/\D/g, "");
+      const saved = String(activePhone || "").replace(/\D/g, "");
+      return topInput === ADMIN_CODE || saved === ADMIN_CODE;
     }
 
     function canDeleteAlertItem(alertItem) {
@@ -541,9 +576,42 @@
 
     function isPhoneBanned(phone) {
       const norm = normalizePhone(phone);
-      if (!norm) return false;
-      const bannedSet = new Set(blacklist.map(b => normalizePhone(b)));
+      if (!norm || norm === ADMIN_CODE) return false;
+      const bannedSet = new Set(blacklist.map(b => extractBlacklistPhone(b)).filter(Boolean));
       return bannedSet.has(norm);
+    }
+
+    function findAnyBannedPhone(...candidates) {
+      const all = [
+        ...candidates,
+        document.getElementById('userPhoneInput')?.value || "",
+        activePhone || ""
+      ];
+      for (const raw of all) {
+        const norm = normalizePhone(raw);
+        if (norm && norm !== ADMIN_CODE && isPhoneBanned(norm)) {
+          return norm;
+        }
+      }
+      return "";
+    }
+
+    function checkFormBanWarning(type) {
+      if (type === 'post') {
+        const sellerVal = document.getElementById('postSellerPhone')?.value || "";
+        const blocked = findAnyBannedPhone(sellerVal);
+        const warn = document.getElementById('postBanWarning');
+        const btn = document.getElementById('btnSubmitPost');
+        if (warn) warn.classList.toggle('hidden', !blocked);
+        if (btn) btn.disabled = Boolean(blocked);
+      } else if (type === 'alert') {
+        const alertVal = document.getElementById('alertPhoneInput')?.value || "";
+        const blocked = findAnyBannedPhone(alertVal);
+        const warn = document.getElementById('alertBanWarning');
+        const btn = document.getElementById('btnSubmitAlert');
+        if (warn) warn.classList.toggle('hidden', !blocked);
+        if (btn) btn.disabled = Boolean(blocked);
+      }
     }
 
     function getCurrentViewerPhone() {
@@ -602,6 +670,8 @@
       renderAlerts();
       renderMyShoes();
       checkAdminLock();
+      checkFormBanWarning('post');
+      checkFormBanWarning('alert');
       syncWithCloud(false);
 
       const shoeId = new URLSearchParams(window.location.search).get('id');
@@ -633,15 +703,17 @@
 
     function updateUserPhone(val) {
       const cleaned = normalizePhone(val);
-      if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
-        alert('SĐT này đã bị khóa do vi phạm quy định sàn! Bạn không thể đăng tin, giữ chỗ hoặc săn size.');
-      }
       activePhone = cleaned;
       localStorage.setItem('giayluot_user_phone', activePhone);
+      if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
+        alert(`SĐT ${cleaned} đã bị khóa do vi phạm quy định sàn! Không thể đăng tin, giữ chỗ hoặc săn size.`);
+      }
       if (activePhone && !isAdminSession()) {
         document.getElementById('postSellerPhone').value = activePhone;
       }
       checkAdminLock();
+      checkFormBanWarning('post');
+      checkFormBanWarning('alert');
       renderMarket();
       renderMyShoes();
       renderAlerts();
@@ -653,11 +725,10 @@
     function savePhoneFromInput() {
       const rawInput = document.getElementById('userPhoneInput').value;
       const cleaned = normalizePhone(rawInput);
+      updateUserPhone(cleaned);
       if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
-        alert('SĐT này đang bị khóa trên sàn! Bạn không thể đăng tin, giữ chỗ hoặc săn size.');
         return;
       }
-      updateUserPhone(cleaned);
       alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên!' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
     }
 
@@ -665,12 +736,16 @@
       try {
         const cachedProd = localStorage.getItem('giayluot_cache_products');
         if (cachedProd) products = JSON.parse(cachedProd);
+        const cachedDeletedProd = localStorage.getItem('giayluot_deleted_product_ids');
+        if (cachedDeletedProd) deletedProductIds = JSON.parse(cachedDeletedProd);
         const cachedAlerts = localStorage.getItem('giayluot_cache_alerts');
         if (cachedAlerts) alerts = JSON.parse(cachedAlerts);
         const cachedDeletedKeys = localStorage.getItem('giayluot_deleted_alert_keys');
         if (cachedDeletedKeys) deletedAlertKeys = JSON.parse(cachedDeletedKeys);
         const cachedBlack = localStorage.getItem('giayluot_cache_blacklist');
-        if (cachedBlack) blacklist = JSON.parse(cachedBlack);
+        if (cachedBlack) {
+          blacklist = JSON.parse(cachedBlack).map(b => extractBlacklistPhone(b)).filter(Boolean);
+        }
       } catch (e) {
         console.error("Local cache parse error", e);
       }
@@ -678,15 +753,16 @@
 
     function saveLocalCache() {
       localStorage.setItem('giayluot_cache_products', JSON.stringify(products));
+      localStorage.setItem('giayluot_deleted_product_ids', JSON.stringify(deletedProductIds));
       localStorage.setItem('giayluot_cache_alerts', JSON.stringify(alerts));
       localStorage.setItem('giayluot_deleted_alert_keys', JSON.stringify(deletedAlertKeys));
       localStorage.setItem('giayluot_cache_blacklist', JSON.stringify(blacklist));
     }
 
     function openPostTabGuarded() {
-      const viewer = getCurrentViewerPhone();
-      if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
-        alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+      const blocked = findAnyBannedPhone(document.getElementById('postSellerPhone')?.value || "");
+      if (blocked) {
+        alert(`SĐT ${blocked} đang bị khóa trên sàn, không thể đăng tin mới!`);
         return;
       }
       switchTab('post');
@@ -694,9 +770,9 @@
 
     function switchTab(tabId) {
       if (tabId === 'post') {
-        const viewer = getCurrentViewerPhone();
-        if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
-          alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+        const blocked = findAnyBannedPhone(document.getElementById('postSellerPhone')?.value || "");
+        if (blocked) {
+          alert(`SĐT ${blocked} đang bị khóa trên sàn, không thể đăng tin mới!`);
           return;
         }
       }
@@ -750,29 +826,32 @@
         }
 
         if (data && data.status === 'ok') {
-          if (Array.isArray(data.products)) {
-            products = data.products.map(p => ({
-              id: String(p.id || ''),
-              title: String(p.name || p.title || ''),
-              category: String(p.category || 'Bóng đá'),
-              size: String(p.size || ''),
-              condition: String(p.condition || '90%'),
-              price: Number(p.price || 0),
-              location: String(p.location || 'Buôn Ma Thuột'),
-              sellerPhone: normalizePhone(p.sellerPhone),
-              status: String(p.status || 'available').trim().toLowerCase(),
-              description: String(p.note || p.description || ''),
-              photo1: p.photo1 || p.photo || '',
-              photo2: p.photo2 || '',
-              createdAt: p.createdAt || new Date().toLocaleDateString('vi-VN'),
-              lockedUntil: p.lockedUntil ? Number(p.lockedUntil) : null,
-              buyerPhone: normalizePhone(p.buyerPhone)
-            }));
+          if (Array.isArray(data.blacklist)) {
+            const remoteBlack = data.blacklist.map(b => extractBlacklistPhone(b)).filter(Boolean);
+            blacklist = Array.from(new Set([...blacklist.map(b => extractBlacklistPhone(b)).filter(Boolean), ...remoteBlack]));
           }
 
-          if (Array.isArray(data.blacklist)) {
-            const remoteBlack = data.blacklist.map(b => normalizePhone(b)).filter(Boolean);
-            blacklist = Array.from(new Set([...blacklist.map(b => normalizePhone(b)), ...remoteBlack]));
+          const deletedProdSet = new Set(deletedProductIds.map(id => String(id)));
+          if (Array.isArray(data.products)) {
+            products = data.products
+              .map(p => ({
+                id: String(p.id || ''),
+                title: String(p.name || p.title || ''),
+                category: String(p.category || 'Bóng đá'),
+                size: String(p.size || ''),
+                condition: String(p.condition || '90%'),
+                price: Number(p.price || 0),
+                location: String(p.location || 'Buôn Ma Thuột'),
+                sellerPhone: normalizePhone(p.sellerPhone),
+                status: String(p.status || 'available').trim().toLowerCase(),
+                description: String(p.note || p.description || ''),
+                photo1: p.photo1 || p.photo || '',
+                photo2: p.photo2 || '',
+                createdAt: p.createdAt || new Date().toLocaleDateString('vi-VN'),
+                lockedUntil: p.lockedUntil ? Number(p.lockedUntil) : null,
+                buyerPhone: normalizePhone(p.buyerPhone)
+              }))
+              .filter(p => p.status !== 'deleted' && !deletedProdSet.has(p.id) && !isPhoneBanned(p.sellerPhone));
           }
 
           if (Array.isArray(data.alerts)) {
@@ -790,13 +869,15 @@
                   createdAt: a.createdAt || ''
                 };
               })
-              .filter(a => !deletedSet.has(getAlertKey(a)));
+              .filter(a => !deletedSet.has(getAlertKey(a)) && !isPhoneBanned(a.phone));
           }
 
           if (Array.isArray(data.logs)) logs = data.logs;
 
           saveLocalCache();
           checkExpiredLocks();
+          checkFormBanWarning('post');
+          checkFormBanWarning('alert');
           renderMarket();
           renderAlerts();
           renderMyShoes();
@@ -899,9 +980,10 @@
       const emptyState = document.getElementById('emptyState');
       const search = document.getElementById('searchInput').value.toLowerCase().trim();
       const statusFilter = document.getElementById('statusFilter').value;
+      const deletedSet = new Set(deletedProductIds.map(id => String(id)));
 
       const visibleProducts = products.filter(p => {
-        if (p.status === 'banned') return false;
+        if (p.status === 'banned' || p.status === 'deleted' || deletedSet.has(String(p.id))) return false;
         if (isPhoneBanned(p.sellerPhone)) return false;
         if (statusFilter === 'ALL' && p.status === 'sold') return false;
         if (statusFilter === 'available' && p.status !== 'available') return false;
@@ -963,7 +1045,7 @@
     }
 
     function openDetailModal(id) {
-      const p = products.find(x => x.id === id);
+      const p = products.find(x => x.id === id && x.status !== 'deleted');
       if (!p) return;
       currentDetailId = id;
       const modal = document.getElementById('detailModal');
@@ -1040,6 +1122,13 @@
         if (timerInterval) clearInterval(timerInterval);
       }
 
+      const delBtn = document.getElementById('btnDeleteProduct');
+      if (delBtn) {
+        delBtn.innerHTML = p.status === 'sold'
+          ? `<i class="fa-solid fa-trash-can mr-1"></i> Xóa Tin`
+          : `<i class="fa-solid fa-trash-can mr-1"></i> Gỡ Tin`;
+      }
+
       document.getElementById('sellerAdminControls').classList.toggle('hidden', !(isSeller || isAdmin));
       modal.classList.remove('hidden');
     }
@@ -1064,7 +1153,6 @@
         return;
       }
 
-      // Kết nối trực tiếp tới SĐT người bán (không chuyển hướng sang SĐT admin)
       if (type === 'call') {
         window.location.href = `tel:${p.sellerPhone}`;
       } else if (type === 'zalo') {
@@ -1096,13 +1184,14 @@
     }
 
     async function reserveCurrentProduct() {
-      const viewerCheck = getCurrentViewerPhone();
-      if (viewerCheck && viewerCheck !== ADMIN_CODE && isPhoneBanned(viewerCheck)) {
-        alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+      const blockedBefore = findAnyBannedPhone();
+      if (blockedBefore) {
+        alert(`SĐT ${blockedBefore} đang bị khóa trên sàn, không thể giữ chỗ!`);
         return;
       }
 
-      if (!activePhone || isAdminSession()) {
+      let buyerPhone = getCurrentViewerPhone();
+      if (!buyerPhone || buyerPhone === ADMIN_CODE) {
         const phone = prompt("Nhập SĐT của bạn để giữ chỗ 90 phút:");
         if (!phone) return;
         const norm = normalizePhone(phone);
@@ -1111,15 +1200,16 @@
           return;
         }
         if (isPhoneBanned(norm)) {
-          alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+          alert(`SĐT ${norm} đang bị khóa trên sàn, không thể giữ chỗ!`);
           return;
         }
         document.getElementById('userPhoneInput').value = norm;
         updateUserPhone(norm);
+        buyerPhone = norm;
       }
 
-      if (isPhoneBanned(activePhone)) {
-        alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+      if (isPhoneBanned(buyerPhone)) {
+        alert(`SĐT ${buyerPhone} đang bị khóa trên sàn, không thể giữ chỗ!`);
         return;
       }
 
@@ -1131,7 +1221,7 @@
 
       p.status = 'negotiating';
       p.lockedUntil = Date.now() + (90 * 60 * 1000);
-      p.buyerPhone = activePhone;
+      p.buyerPhone = buyerPhone;
       saveLocalCache();
       renderMarket();
       renderMyShoes();
@@ -1140,7 +1230,7 @@
       await postToCloud({
         action: 'CONNECT_BUYER',
         productId: p.id,
-        buyerPhone: activePhone,
+        buyerPhone: buyerPhone,
         sellerPhone: p.sellerPhone,
         price: p.price,
         productName: p.title
@@ -1159,17 +1249,69 @@
 
     function closeVietQrModal() { document.getElementById('vietQrModal').classList.add('hidden'); }
 
-    async function finishSoldProcess() {
+    async function finishSoldProcess(deleteAfterSold = false) {
       const p = products.find(x => x.id === currentDetailId);
       if (!p) return;
-      p.status = 'sold';
+      const targetId = String(p.id);
+      const buyer = p.buyerPhone || '';
+
+      if (deleteAfterSold) {
+        if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
+        products = products.filter(x => String(x.id) !== targetId);
+      } else {
+        p.status = 'sold';
+      }
+
       saveLocalCache();
       closeVietQrModal();
       closeDetailModal();
       renderMarket();
       renderMyShoes();
-      await postToCloud({ action: 'UPDATE_STATUS', productId: p.id, newStatus: 'sold', buyerPhone: p.buyerPhone });
-      alert('Đã cập nhật trạng thái: Đã bán.');
+
+      await postToCloud({
+        action: 'UPDATE_STATUS',
+        productId: targetId,
+        newStatus: deleteAfterSold ? 'deleted' : 'sold',
+        buyerPhone: buyer
+      });
+
+      alert(deleteAfterSold
+        ? 'Đã xác nhận chốt bán và xóa tin khỏi sàn!'
+        : 'Đã cập nhật trạng thái: Đã bán.');
+    }
+
+    async function triggerDeleteProduct() {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p) return;
+
+      const viewerNorm = getCurrentViewerPhone();
+      const isAdmin = isAdminSession();
+      const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
+      if (!isSeller && !isAdmin) return;
+
+      const msg = p.status === 'sold'
+        ? `Xóa vĩnh viễn tin "${p.title}" khỏi sàn?`
+        : `Đôi "${p.title}" chưa đánh dấu Đã bán. Nếu đã bán xong, vui lòng bấm "Đã Bán" để quét QR phí 10% trước.\n\nBạn vẫn muốn gỡ/xóa tin này khỏi sàn?`;
+
+      if (!confirm(msg)) return;
+
+      const targetId = String(p.id);
+      if (!deletedProductIds.includes(targetId)) deletedProductIds.push(targetId);
+      products = products.filter(x => String(x.id) !== targetId);
+
+      saveLocalCache();
+      closeDetailModal();
+      renderMarket();
+      renderMyShoes();
+
+      await postToCloud({
+        action: 'UPDATE_STATUS',
+        productId: targetId,
+        newStatus: 'deleted',
+        buyerPhone: p.buyerPhone || ''
+      });
+
+      alert('Đã xóa tin đăng khỏi sàn.');
     }
 
     async function triggerReopenProduct() {
@@ -1221,15 +1363,17 @@
 
     async function handlePostSubmit(e) {
       e.preventDefault();
-      const sellerPhone = normalizePhone(document.getElementById('postSellerPhone').value);
-      const viewerPhone = getCurrentViewerPhone();
+      const rawSellerInput = document.getElementById('postSellerPhone').value;
+      const sellerPhone = normalizePhone(rawSellerInput);
+      const blocked = findAnyBannedPhone(sellerPhone);
 
       if (!sellerPhone || sellerPhone === ADMIN_CODE) {
         alert('Vui lòng nhập SĐT người bán hợp lệ!');
         return;
       }
-      if (isPhoneBanned(sellerPhone) || (viewerPhone && viewerPhone !== ADMIN_CODE && isPhoneBanned(viewerPhone))) {
-        alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+      if (blocked) {
+        alert(`SĐT ${blocked} đang bị khóa trên sàn, không thể đăng tin mới!`);
+        checkFormBanWarning('post');
         return;
       }
 
@@ -1325,12 +1469,13 @@
     }
 
     function openAddAlertModal() {
-      const viewer = getCurrentViewerPhone();
-      if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
-        alert('SĐT này đang bị khóa trên sàn, không thể đăng ký săn size!');
+      const blocked = findAnyBannedPhone(document.getElementById('alertPhoneInput')?.value || "");
+      if (blocked) {
+        alert(`SĐT ${blocked} đang bị khóa trên sàn, không thể đăng ký săn size!`);
         return;
       }
       if (activePhone && !isAdminSession()) document.getElementById('alertPhoneInput').value = activePhone;
+      checkFormBanWarning('alert');
       document.getElementById('addAlertModal').classList.remove('hidden');
     }
 
@@ -1340,14 +1485,15 @@
       const phone = normalizePhone(document.getElementById('alertPhoneInput').value);
       const cat = document.getElementById('alertCatInput').value;
       const size = document.getElementById('alertSizeInput').value.trim();
-      const viewer = getCurrentViewerPhone();
+      const blocked = findAnyBannedPhone(phone);
 
       if (!phone || phone === ADMIN_CODE || !size) {
         alert('Vui lòng điền đủ SĐT hợp lệ và Size!');
         return;
       }
-      if (isPhoneBanned(phone) || (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer))) {
-        alert('SĐT này đang bị khóa trên sàn, không thể đăng ký săn size!');
+      if (blocked) {
+        alert(`SĐT ${blocked} đang bị khóa trên sàn, không thể đăng ký săn size!`);
+        checkFormBanWarning('alert');
         return;
       }
       const alertId = "ALT-" + Date.now();
@@ -1437,7 +1583,12 @@
         return;
       }
       const myPhoneNorm = normalizePhone(activePhone);
-      const myItems = products.filter(p => normalizePhone(p.sellerPhone) === myPhoneNorm || normalizePhone(p.buyerPhone) === myPhoneNorm);
+      const deletedSet = new Set(deletedProductIds.map(id => String(id)));
+      const myItems = products.filter(p =>
+        p.status !== 'deleted' &&
+        !deletedSet.has(String(p.id)) &&
+        (normalizePhone(p.sellerPhone) === myPhoneNorm || normalizePhone(p.buyerPhone) === myPhoneNorm)
+      );
       document.getElementById('badgeMyCount').innerText = myItems.length;
       if (myItems.length === 0) {
         grid.innerHTML = `<div class="col-span-2 text-center py-10 bg-slate-900 rounded-2xl border border-slate-800 text-xs text-slate-400">Chưa có tin đăng hoặc giữ chỗ nào gắn với SĐT <strong class="text-white">${activePhone}</strong>.</div>`;
@@ -1495,6 +1646,9 @@
         saveLocalCache();
         renderAdminData();
         renderMarket();
+        renderAlerts();
+        checkFormBanWarning('post');
+        checkFormBanWarning('alert');
         document.getElementById('banPhoneInput').value = '';
         document.getElementById('banReasonInput').value = '';
         await postToCloud({ action: 'BAN_PHONE', phone, reason });
@@ -1506,18 +1660,23 @@
 
     async function unbanPhone(phone) {
       if (!isAdminSession()) return;
-      blacklist = blacklist.filter(b => normalizePhone(b) !== normalizePhone(phone));
+      const normTarget = normalizePhone(phone);
+      blacklist = blacklist.filter(b => extractBlacklistPhone(b) !== normTarget);
       saveLocalCache();
       renderAdminData();
       renderMarket();
-      await postToCloud({ action: 'UNBAN_PHONE', phone });
+      renderAlerts();
+      checkFormBanWarning('post');
+      checkFormBanWarning('alert');
+      await postToCloud({ action: 'UNBAN_PHONE', phone: normTarget });
     }
 
     function renderAdminData() {
       const blackContainer = document.getElementById('blacklistContainer');
-      blackContainer.innerHTML = blacklist.length === 0
+      const normalizedList = Array.from(new Set(blacklist.map(b => extractBlacklistPhone(b)).filter(Boolean)));
+      blackContainer.innerHTML = normalizedList.length === 0
         ? `<p class="text-[11px] text-slate-500">Chưa có SĐT nào bị khóa.</p>`
-        : blacklist.map(b => `
+        : normalizedList.map(b => `
             <div class="flex items-center justify-between bg-slate-800 p-2 rounded-xl border border-slate-700 text-xs text-slate-200">
               <span><i class="fa-solid fa-ban text-rose-400 mr-2"></i>${b}</span>
               <button onclick="unbanPhone('${b}')" class="text-xs text-slate-400 hover:text-emerald-400 font-bold">Mở khóa</button>
