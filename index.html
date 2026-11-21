@@ -268,7 +268,7 @@
       <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg flex items-center justify-between gap-3">
         <div>
           <h2 class="text-sm font-extrabold text-white">SĂN SIZE GIÀY THEO YÊU CẦU</h2>
-          <p class="text-xs text-slate-400">Lưu môn & size bạn cần để dễ theo dõi khi có kèo mới.</p>
+          <p class="text-xs text-slate-400">Lưu môn & size bạn cần để dễ theo dõi khi có kèo mới (SĐT được ẩn bảo mật).</p>
         </div>
         <button onclick="openAddAlertModal()"
           class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap transition">
@@ -514,6 +514,7 @@
 
     let products = [];
     let alerts = [];
+    let deletedAlertIds = [];
     let blacklist = [];
     let logs = [];
 
@@ -544,10 +545,22 @@
     }
 
     function maskPhoneNumber(phone) {
-      const clean = String(phone || "").replace(/\D/g, "");
+      const clean = normalizePhone(phone) || String(phone || "").replace(/\D/g, "");
       if (!clean) return "Đang ẩn";
       if (clean.length <= 6) return clean.slice(0, 2) + "***" + clean.slice(-1);
       return clean.slice(0, 4) + "***" + clean.slice(-3);
+    }
+
+    function formatShortDate(val) {
+      if (!val) return "";
+      const str = String(val);
+      if (str.includes("GMT")) {
+        const d = new Date(str);
+        if (!Number.isNaN(d.getTime())) {
+          return d.toLocaleDateString('vi-VN');
+        }
+      }
+      return str;
     }
 
     function setCloudStatus(state, text) {
@@ -619,6 +632,7 @@
       checkAdminLock();
       renderMarket();
       renderMyShoes();
+      renderAlerts();
     }
 
     function savePhoneFromInput() {
@@ -638,6 +652,8 @@
         if (cachedProd) products = JSON.parse(cachedProd);
         const cachedAlerts = localStorage.getItem('giayluot_cache_alerts');
         if (cachedAlerts) alerts = JSON.parse(cachedAlerts);
+        const cachedDeletedAlerts = localStorage.getItem('giayluot_deleted_alert_ids');
+        if (cachedDeletedAlerts) deletedAlertIds = JSON.parse(cachedDeletedAlerts);
         const cachedBlack = localStorage.getItem('giayluot_cache_blacklist');
         if (cachedBlack) blacklist = JSON.parse(cachedBlack);
       } catch (e) {
@@ -648,6 +664,7 @@
     function saveLocalCache() {
       localStorage.setItem('giayluot_cache_products', JSON.stringify(products));
       localStorage.setItem('giayluot_cache_alerts', JSON.stringify(alerts));
+      localStorage.setItem('giayluot_deleted_alert_ids', JSON.stringify(deletedAlertIds));
       localStorage.setItem('giayluot_cache_blacklist', JSON.stringify(blacklist));
     }
 
@@ -742,7 +759,20 @@
             const remoteBlack = data.blacklist.map(b => normalizePhone(b)).filter(Boolean);
             blacklist = Array.from(new Set([...blacklist.map(b => normalizePhone(b)), ...remoteBlack]));
           }
-          if (Array.isArray(data.alerts)) alerts = data.alerts;
+
+          if (Array.isArray(data.alerts)) {
+            const deletedSet = new Set(deletedAlertIds.map(String));
+            alerts = data.alerts
+              .map((a, idx) => ({
+                id: String(a.id || `ALT-REMOTE-${idx}-${normalizePhone(a.phone)}-${a.category}-${a.size}`),
+                phone: normalizePhone(a.phone),
+                category: String(a.category || 'Bóng đá'),
+                size: String(a.size || ''),
+                createdAt: a.createdAt || ''
+              }))
+              .filter(a => !deletedSet.has(String(a.id)));
+          }
+
           if (Array.isArray(data.logs)) logs = data.logs;
 
           saveLocalCache();
@@ -1293,42 +1323,62 @@
         alert('SĐT này đang bị khóa trên sàn, không thể đăng ký săn size!');
         return;
       }
-      const newAlert = { id: "ALT-" + Date.now(), phone, category: cat, size, createdAt: new Date().toLocaleDateString('vi-VN') };
+      const alertId = "ALT-" + Date.now();
+      deletedAlertIds = deletedAlertIds.filter(id => String(id) !== alertId);
+      const newAlert = { id: alertId, phone, category: cat, size, createdAt: new Date().toLocaleDateString('vi-VN') };
       alerts.unshift(newAlert);
       saveLocalCache();
       closeAddAlertModal();
       renderAlerts();
-      await postToCloud({ action: 'ADD_ALERT', phone, category: cat, size });
+      await postToCloud({ action: 'ADD_ALERT', id: alertId, phone, category: cat, size });
       alert('Đã lưu yêu cầu săn size!');
     }
 
-    function deleteAlert(id) {
-      alerts = alerts.filter(a => a.id !== id);
+    async function deleteAlert(id) {
+      const target = alerts.find(a => String(a.id) === String(id));
+      alerts = alerts.filter(a => String(a.id) !== String(id));
+      if (!deletedAlertIds.includes(String(id))) {
+        deletedAlertIds.push(String(id));
+      }
       saveLocalCache();
       renderAlerts();
+      await postToCloud({
+        action: 'DELETE_ALERT',
+        id: String(id),
+        phone: target ? normalizePhone(target.phone) : '',
+        category: target ? target.category : '',
+        size: target ? target.size : ''
+      });
     }
 
     function renderAlerts() {
       const list = document.getElementById('alertsList');
+      const isAdmin = isAdminSession();
+      const viewerNorm = getCurrentViewerPhone();
       document.getElementById('badgeAlertsCount').innerText = alerts.length;
       if (alerts.length === 0) {
         list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Chưa có yêu cầu săn size nào. Bấm "Đăng ký săn size" để tạo mới.</div>`;
         return;
       }
-      list.innerHTML = alerts.map(a => `
-        <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs shadow-md">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold">
-              <i class="fa-solid fa-bell"></i>
+      list.innerHTML = alerts.map(a => {
+        const phoneNorm = normalizePhone(a.phone);
+        const canDelete = isAdmin || (viewerNorm && phoneNorm && viewerNorm === phoneNorm);
+        const displayPhone = isAdmin ? (phoneNorm || 'Đang ẩn') : maskPhoneNumber(phoneNorm);
+        return `
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs shadow-md">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <div>
+                <p class="font-extrabold text-slate-100">${a.category} • Size <span class="text-orange-400 font-black">${a.size}</span></p>
+                <p class="text-[11px] text-slate-400">SĐT: ${displayPhone} • ${formatShortDate(a.createdAt)}</p>
+              </div>
             </div>
-            <div>
-              <p class="font-extrabold text-slate-100">${a.category} • Size <span class="text-orange-400 font-black">${a.size}</span></p>
-              <p class="text-[11px] text-slate-400">SĐT: ${maskPhoneNumber(a.phone)} • ${a.createdAt || ''}</p>
-            </div>
+            ${canDelete ? `<button onclick="deleteAlert('${a.id}')" title="Xóa săn size" class="p-2 text-slate-400 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-[10px] text-slate-500">Bảo mật</span>`}
           </div>
-          <button onclick="deleteAlert('${a.id}')" class="p-2 text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderMyShoes() {
