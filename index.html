@@ -160,7 +160,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-extrabold text-white">ĐĂNG PASS GIÀY LƯỚT</h2>
-            <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • SĐT người bán được bảo mật ẩn công khai • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
+            <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
           </div>
           <a href="tel:0906075077" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-orange-400 hover:bg-slate-700">
             <i class="fa-solid fa-phone mr-1"></i>Hỗ trợ
@@ -220,7 +220,7 @@
             </div>
 
             <div>
-              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán (được ẩn bảo mật) *</label>
+              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán *</label>
               <input id="postSellerPhone" required type="tel" placeholder="09xxxxxxxx"
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
@@ -503,7 +503,6 @@
   <script>
     const ADMIN_CODE = "204201504042019";
     const ALERT_OWNER_OVERRIDE_PHONE = "0909215078";
-    const ADMIN_CONTACT_PHONE = "0906075077";
     const SHB_ACCOUNT = "7772345999";
     const SHB_NAME = "NGUYEN UNG";
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
@@ -987,7 +986,6 @@
       document.getElementById('modalSize').innerText = p.size;
       document.getElementById('modalCond').innerText = p.condition;
       document.getElementById('modalLoc').innerText = p.location;
-      // Bảo mật SĐT người bán: chỉ hiện đầy đủ cho chủ tin hoặc Admin; người ngoài/người mua luôn thấy dạng ẩn bảo mật
       document.getElementById('modalSeller').innerText = (isSeller || isAdmin)
         ? (p.sellerPhone || 'Chưa có SĐT')
         : maskPhoneNumber(p.sellerPhone);
@@ -1007,7 +1005,6 @@
 
       const callBtn = document.getElementById('btnCallSeller');
       const zaloBtn = document.getElementById('btnZaloSeller');
-      // Cho phép người đang giữ chỗ (isCurrentBuyer), chủ tin (isSeller), hoặc Admin gọi/Zalo khi giữ chỗ; khóa người thứ 3
       const canContactSeller = !isReserved || isCurrentBuyer || isSeller || isAdmin;
 
       if (canContactSeller) {
@@ -1058,20 +1055,20 @@
       const isReserved = p.status === 'negotiating';
 
       if (isReserved && !isCurrentBuyer && !isSeller && !isAdmin) {
-        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo để tránh làm gián đoạn giao dịch.');
+        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo người bán để tránh làm gián đoạn giao dịch.');
         return;
       }
 
-      // Khi người mua/khách liên hệ trên sàn, kết nối qua số/Zalo cầu nối của sàn để bảo vệ SĐT cá nhân người bán;
-      // chủ tin hoặc admin khi cần vẫn có thể gọi/Zalo trực tiếp SĐT người bán.
-      const targetPhone = (isSeller || isAdmin)
-        ? (p.sellerPhone || ADMIN_CONTACT_PHONE)
-        : ADMIN_CONTACT_PHONE;
+      if (!p.sellerPhone) {
+        alert('Tin đăng chưa có SĐT người bán.');
+        return;
+      }
 
+      // Kết nối trực tiếp tới SĐT người bán (không chuyển hướng sang SĐT admin)
       if (type === 'call') {
-        window.location.href = `tel:${targetPhone}`;
+        window.location.href = `tel:${p.sellerPhone}`;
       } else if (type === 'zalo') {
-        window.open(`https://zalo.me/${targetPhone}`, '_blank', 'noopener,noreferrer');
+        window.open(`https://zalo.me/${p.sellerPhone}`, '_blank', 'noopener,noreferrer');
       }
     }
 
@@ -1148,7 +1145,7 @@
         price: p.price,
         productName: p.title
       });
-      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}. Bạn vẫn có thể gọi điện / Zalo để chốt kèo trong thời gian giữ chỗ.`);
+      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}. Bạn vẫn có thể gọi điện / Zalo trực tiếp người bán để chốt kèo.`);
     }
 
     function confirmSoldAndCloseQR() {
@@ -1281,7 +1278,7 @@
         document.getElementById('userPhoneInput').value = sellerPhone;
         updateUserPhone(sellerPhone);
       }
-      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets! SĐT của bạn được ẩn bảo mật với người xem công khai.');
+      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets!');
       switchTab('market');
     }
 
