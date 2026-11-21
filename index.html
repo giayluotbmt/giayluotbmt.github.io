@@ -105,7 +105,7 @@
           <div class="relative flex-grow">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input id="searchInput" oninput="renderMarket()" type="text"
-              placeholder="Tìm tên giày, hãng, phường/xã hoặc địa danh (BMT, Ea Kar, Tân An...)"
+              placeholder="Tìm tên giày, hãng, khu vực (BMT, Cư M'gar, Cumgar, Cư Jút...)"
               class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-500 transition" />
           </div>
 
@@ -142,7 +142,7 @@
           <button id="sizeBtn-44" onclick="setSizeFilter('44')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">44</button>
         </div>
 
-        <!-- DYNAMIC LOCATION FILTER BAR (AUTO-BUILT FROM ACTIVE LISTINGS) -->
+        <!-- DYNAMIC LOCATION FILTER BAR (AUTO-BUILT & MERGED FROM ACTIVE LISTINGS) -->
         <div id="dynamicLocationBar" class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs"></div>
       </div>
 
@@ -225,7 +225,7 @@
             <div>
               <label class="block text-slate-300 font-bold mb-1">Khu vực giao dịch *</label>
               <input id="postLocation" required type="text" value="Buôn Ma Thuột"
-                placeholder="VD: Buôn Ma Thuột, Tân An, Ea Kar..."
+                placeholder="VD: Buôn Ma Thuột, Cư M'gar, Cư Jút, Ea Kar..."
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
             </div>
 
@@ -573,15 +573,15 @@
     }
 
     function getCanonicalLocationKey(rawLoc) {
-      const norm = normalizeAreaText(rawLoc);
-      if (!norm) return "";
-      if (norm === "bmt" || norm.includes("buon ma thuot")) return "buon ma thuot";
-      return norm;
+      const compact = normalizeAreaText(rawLoc).replace(/\s+/g, '');
+      if (!compact) return "";
+      if (compact === "bmt" || compact.includes("buonmathuot")) return "buonmathuot";
+      return compact;
     }
 
     function getCanonicalLocationLabel(rawLoc) {
       const key = getCanonicalLocationKey(rawLoc);
-      if (key === "buon ma thuot") return "Buôn Ma Thuột";
+      if (key === "buonmathuot") return "Buôn Ma Thuột";
       return String(rawLoc || "").trim();
     }
 
@@ -1031,10 +1031,15 @@
       baseProducts.forEach(p => {
         const key = getCanonicalLocationKey(p.location);
         if (!key) return;
+        const candidateLabel = getCanonicalLocationLabel(p.location);
         if (!areaMap.has(key)) {
-          areaMap.set(key, { key, label: getCanonicalLocationLabel(p.location), count: 1 });
+          areaMap.set(key, { key, label: candidateLabel, count: 1 });
         } else {
-          areaMap.get(key).count += 1;
+          const existing = areaMap.get(key);
+          existing.count += 1;
+          if (candidateLabel.length > existing.label.length) {
+            existing.label = candidateLabel;
+          }
         }
       });
 
@@ -1085,6 +1090,7 @@
       const grid = document.getElementById('marketGrid');
       const emptyState = document.getElementById('emptyState');
       const search = normalizeAreaText(document.getElementById('searchInput').value);
+      const compactSearch = search.replace(/\s+/g, '');
       const statusFilter = document.getElementById('statusFilter').value;
       const deletedSet = new Set(deletedProductIds.map(id => String(id)));
 
@@ -1102,7 +1108,8 @@
 
       const visibleProducts = statusBaseProducts.filter(p => {
         const searchableBlob = normalizeAreaText(`${p.title} ${p.category} ${p.location} ${p.condition} ${p.description}`);
-        if (search && !searchableBlob.includes(search)) return false;
+        const compactBlob = searchableBlob.replace(/\s+/g, '');
+        if (search && !searchableBlob.includes(search) && !compactBlob.includes(compactSearch)) return false;
 
         if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
         if (selectedSize !== 'ALL' && String(p.size).replace(/\D/g, '') !== String(selectedSize)) return false;
