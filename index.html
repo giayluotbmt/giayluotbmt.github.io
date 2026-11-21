@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIÀY LƯỚT BMT - Sàn Kèo Giày Thể Thao Buôn Ma Thuột</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+
+  <!-- TOP BAR -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 shadow-lg">
+    <div class="max-w-5xl mx-auto px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center font-black shadow-md shadow-orange-500/20">
+          <i class="fa-solid fa-shoe-prints -rotate-12"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-extrabold text-white leading-tight tracking-tight">GIÀY LƯỚT BMT</h1>
+            <span class="px-1.5 py-0.5 rounded bg-orange-500/20 border border-orange-500/40 text-orange-400 text-[10px] font-extrabold">ĐẮK LẮK</span>
+            <span id="cloudStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Đang kết nối...
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400">Chợ Giày Cũ Cầu Nối Buôn Ma Thuột • Phí 10% khi giao dịch xong</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1">
+          <i class="fa-solid fa-phone text-orange-400 text-xs mr-1.5"></i>
+          <input id="userPhoneInput" type="text" placeholder="Nhập SĐT của bạn..."
+            class="bg-transparent text-xs text-slate-100 placeholder-slate-400 focus:outline-none w-32" />
+          <button onclick="savePhoneFromInput()"
+            class="ml-1 px-2.5 py-0.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold transition">
+            Lưu
+          </button>
+        </div>
+
+        <button onclick="manualSync()" title="Đồng bộ dữ liệu từ Google Sheets"
+          class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
+          <i id="syncIcon" class="fa-solid fa-rotate text-orange-400"></i>
+          <span class="hidden sm:inline">Đồng bộ</span>
+        </button>
+
+        <button onclick="openShareModal()" title="Chia sẻ Link & Mã QR"
+          class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-qrcode"></i>
+          <span>Chia sẻ / QR</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-5xl mx-auto px-3.5 flex items-center gap-1 overflow-x-auto border-t border-slate-800/80 text-xs font-bold">
+      <button id="tab-market" onclick="switchTab('market')"
+        class="px-3 py-2.5 border-b-2 border-orange-500 text-orange-400 whitespace-nowrap flex items-center gap-1.5">
+        <i class="fa-solid fa-store"></i> Sàn Giày
+        <span id="badgeMarketCount" class="px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[10px]">0</span>
+      </button>
+
+      <button id="tab-post" onclick="switchTab('post')"
+        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        <i class="fa-solid fa-plus-circle text-emerald-400"></i> Đăng Pass Giày
+      </button>
+
+      <button id="tab-alerts" onclick="switchTab('alerts')"
+        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        <i class="fa-solid fa-bell text-amber-400"></i> Săn Size
+        <span id="badgeAlertsCount" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px]">0</span>
+      </button>
+
+      <button id="tab-my-shoes" onclick="switchTab('my-shoes')"
+        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5">
+        <i class="fa-solid fa-bag-shopping text-sky-400"></i> Tin Của Tôi
+        <span id="badgeMyCount" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px]">0</span>
+      </button>
+
+      <button id="tab-admin" onclick="switchTab('admin')"
+        class="px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center gap-1.5 ml-auto">
+        <i class="fa-solid fa-user-shield text-rose-400"></i> Quản Trị
+      </button>
+    </div>
+
+    <!-- HOTLINE BAR -->
+    <div class="bg-gradient-to-r from-orange-600/20 via-amber-500/15 to-orange-600/20 border-t border-orange-500/20 py-1.5 px-3.5 text-center text-[11px] text-orange-200">
+      <span class="inline-flex items-center gap-1.5 font-bold text-orange-400">
+        <i class="fa-solid fa-headset"></i> HOTLINE / ZALO ADMIN: 0906.075.077
+      </span>
+      <span class="mx-1.5 text-slate-500">•</span>
+      <span>Người mua cọc giữ chỗ 90 phút • Chốt bán thành công chuyển 10% phí cầu nối về tài khoản SHB <strong>7772345999</strong></span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-5xl mx-auto px-3.5 py-4 pb-16">
+
+    <!-- ==================== SÀN GIÀY ==================== -->
+    <section id="sec-market" class="space-y-3.5">
+      <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <div class="relative flex-grow">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input id="searchInput" oninput="renderMarket()" type="text"
+              placeholder="Tìm tên giày, thương hiệu (Mizuno, Nike, Adidas, Puma...)..."
+              class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-500 transition" />
+          </div>
+
+          <select id="statusFilter" onchange="renderMarket()"
+            class="bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-orange-500">
+            <option value="ALL">Tất cả đang mở</option>
+            <option value="available">Đang bán</option>
+            <option value="negotiating">Đang giữ chỗ 90p</option>
+            <option value="sold">Đã bán</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs">
+          <span class="text-[11px] font-bold text-slate-400 uppercase mr-1">MÔN:</span>
+          <button id="catBtn-ALL" onclick="setCategoryFilter('ALL')" class="cat-btn px-3 py-1 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap">Tất cả</button>
+          <button id="catBtn-Bóng đá" onclick="setCategoryFilter('Bóng đá')" class="cat-btn px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-medium whitespace-nowrap">⚽ Bóng đá</button>
+          <button id="catBtn-Chạy bộ" onclick="setCategoryFilter('Chạy bộ')" class="cat-btn px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-medium whitespace-nowrap">🏃 Chạy bộ</button>
+          <button id="catBtn-Cầu lông" onclick="setCategoryFilter('Cầu lông')" class="cat-btn px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-medium whitespace-nowrap">🏸 Cầu lông</button>
+          <button id="catBtn-Bóng rổ" onclick="setCategoryFilter('Bóng rổ')" class="cat-btn px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-medium whitespace-nowrap">🏀 Bóng rổ</button>
+          <button id="catBtn-Tennis/Pickleball" onclick="setCategoryFilter('Tennis/Pickleball')" class="cat-btn px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-medium whitespace-nowrap">🎾 Tennis/Pickleball</button>
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs">
+          <span class="text-[11px] font-bold text-slate-400 uppercase mr-1">SIZE:</span>
+          <button id="sizeBtn-ALL" onclick="setSizeFilter('ALL')" class="size-btn px-2.5 py-1 rounded-full bg-orange-500 text-white font-bold text-[11px] whitespace-nowrap">Tất cả</button>
+          <button id="sizeBtn-36" onclick="setSizeFilter('36')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">36</button>
+          <button id="sizeBtn-37" onclick="setSizeFilter('37')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">37</button>
+          <button id="sizeBtn-38" onclick="setSizeFilter('38')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">38</button>
+          <button id="sizeBtn-39" onclick="setSizeFilter('39')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">39</button>
+          <button id="sizeBtn-40" onclick="setSizeFilter('40')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">40</button>
+          <button id="sizeBtn-41" onclick="setSizeFilter('41')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">41</button>
+          <button id="sizeBtn-42" onclick="setSizeFilter('42')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">42</button>
+          <button id="sizeBtn-43" onclick="setSizeFilter('43')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">43</button>
+          <button id="sizeBtn-44" onclick="setSizeFilter('44')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">44</button>
+        </div>
+      </div>
+
+      <div id="emptyState" class="hidden text-center py-12 bg-slate-900 rounded-2xl border border-slate-800 space-y-2.5">
+        <i class="fa-solid fa-box-open text-3xl text-slate-500"></i>
+        <p class="text-sm font-bold text-slate-200">Chưa có đôi giày nào trên sàn</p>
+        <p class="text-xs text-slate-400">Chưa có sản phẩm nào khớp bộ lọc hoặc hệ thống đang cập nhật. Hãy là người đầu tiên đăng pass giày!</p>
+        <button onclick="openPostTabGuarded()" class="mt-1 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-extrabold transition">
+          <i class="fa-solid fa-plus-circle mr-1"></i> Đăng Pass Giày Ngay
+        </button>
+      </div>
+
+      <div id="marketGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- ==================== ĐĂNG PASS ==================== -->
+    <section id="sec-post" class="hidden max-w-xl mx-auto">
+      <div class="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-lg space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-extrabold text-white">ĐĂNG PASS GIÀY LƯỚT</h2>
+            <p class="text-xs text-slate-400">Đăng tin trực tiếp lên hệ thống • Phí kết nối 10% (tối thiểu 10.000đ) khi chốt đơn.</p>
+          </div>
+          <a href="tel:0906075077" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-orange-400 hover:bg-slate-700">
+            <i class="fa-solid fa-phone mr-1"></i>Hỗ trợ
+          </a>
+        </div>
+
+        <form id="postForm" onsubmit="handlePostSubmit(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Tên giày & phối màu *</label>
+            <input id="postName" required type="text" placeholder="VD: Giày thể thao Wika Netic ĐỎ"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Bộ môn *</label>
+              <select id="postCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500">
+                <option value="Bóng đá">Bóng đá</option>
+                <option value="Chạy bộ">Chạy bộ</option>
+                <option value="Cầu lông">Cầu lông</option>
+                <option value="Bóng rổ">Bóng rổ</option>
+                <option value="Tennis/Pickleball">Tennis/Pickleball</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Size giày *</label>
+              <input id="postSize" required type="text" placeholder="VD: 41"
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Giá pass (VNĐ) *</label>
+              <input id="postPrice" required type="number" min="10000" step="1000" placeholder="VD: 390000"
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Tình trạng *</label>
+              <select id="postCondition" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500">
+                <option value="99% - Lướt nhẹ">99% - Lướt nhẹ</option>
+                <option value="98% - Như mới">98% - Như mới</option>
+                <option value="95% - Đế đẹp">95% - Đế đẹp</option>
+                <option value="90% - Đã sử dụng">90% - Đã sử dụng</option>
+                <option value="85% - Cày sân tốt">85% - Cày sân tốt</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Khu vực giao dịch *</label>
+              <input id="postLocation" required type="text" value="Buôn Ma Thuột"
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500" />
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">SĐT / Zalo người bán *</label>
+              <input id="postSellerPhone" required type="tel" placeholder="09xxxxxxxx"
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Ảnh thực tế (Tối đa 2 ảnh)</label>
+            <div class="grid grid-cols-2 gap-2.5">
+              <label class="relative h-28 rounded-xl border border-dashed border-slate-700 bg-slate-800/60 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 overflow-hidden">
+                <input type="file" accept="image/*" onchange="handleImageCompress(event, 1)" class="hidden" />
+                <div id="placeholder1" class="text-center text-slate-400 space-y-1">
+                  <i class="fa-solid fa-camera text-lg text-orange-400"></i>
+                  <p class="text-[10px] font-semibold">Ảnh 1 (Toàn cảnh)</p>
+                </div>
+                <img id="prevPhoto1" class="hidden w-full h-full object-cover" />
+              </label>
+
+              <label class="relative h-28 rounded-xl border border-dashed border-slate-700 bg-slate-800/60 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 overflow-hidden">
+                <input type="file" accept="image/*" onchange="handleImageCompress(event, 2)" class="hidden" />
+                <div id="placeholder2" class="text-center text-slate-400 space-y-1">
+                  <i class="fa-solid fa-shoe-prints text-lg text-orange-400"></i>
+                  <p class="text-[10px] font-semibold">Ảnh 2 (Đế / Tem)</p>
+                </div>
+                <img id="prevPhoto2" class="hidden w-full h-full object-cover" />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Ghi chú thêm</label>
+            <textarea id="postNote" rows="2" placeholder="VD: Đế bám sân tốt, giao dịch trực tiếp tại BMT..."
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500"></textarea>
+          </div>
+
+          <button id="btnSubmitPost" type="submit"
+            class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wide shadow-md transition">
+            <i class="fa-solid fa-paper-plane mr-1"></i> Đăng Pass Lên Sàn
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== SĂN SIZE ==================== -->
+    <section id="sec-alerts" class="hidden max-w-xl mx-auto space-y-3">
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-extrabold text-white">SĂN SIZE GIÀY THEO YÊU CẦU</h2>
+          <p class="text-xs text-slate-400">Lưu môn & size bạn cần để dễ theo dõi khi có kèo mới.</p>
+        </div>
+        <button onclick="openAddAlertModal()"
+          class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap transition">
+          <i class="fa-solid fa-plus mr-1"></i> Đăng ký săn size
+        </button>
+      </div>
+
+      <div id="alertsList" class="space-y-2"></div>
+    </section>
+
+    <!-- ==================== TIN CỦA TÔI ==================== -->
+    <section id="sec-my-shoes" class="hidden space-y-3">
+      <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-lg">
+        <h2 class="text-sm font-extrabold text-white">TIN CỦA TÔI</h2>
+        <p class="text-xs text-slate-400">Các tin đăng hoặc giữ chỗ liên quan đến SĐT bạn đã lưu ở thanh trên.</p>
+      </div>
+
+      <div id="myShoesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+    </section>
+
+    <!-- ==================== QUẢN TRỊ ==================== -->
+    <section id="sec-admin" class="hidden max-w-xl mx-auto space-y-4">
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-extrabold text-white">QUẢN TRỊ HỆ THỐNG</h2>
+          <p class="text-xs text-slate-400">Nhập mã khóa quản trị ở ô trên cùng rồi bấm Lưu để mở khóa.</p>
+        </div>
+        <span id="adminLockBadge" class="px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[11px] font-bold">LOCKED</span>
+      </div>
+
+      <div id="adminLockedNotice" class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center space-y-2 text-xs text-slate-400 shadow-lg">
+        <i class="fa-solid fa-lock text-2xl text-rose-400"></i>
+        <p class="font-semibold text-slate-200">Khu vực quản trị đang khóa</p>
+        <p>Chỉ quản trị viên có mã khóa riêng mới có thể truy cập mục này.</p>
+      </div>
+
+      <div id="adminContent" class="hidden space-y-4">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2.5 text-xs">
+          <div class="flex items-center justify-between">
+            <label class="font-extrabold text-slate-200 uppercase">Link Google Apps Script (/exec)</label>
+            <span class="text-[11px] text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>Đã cấu hình sẵn link mới</span>
+          </div>
+          <input id="adminScriptUrlInput" type="text"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-orange-500" />
+          <div class="flex gap-2">
+            <button onclick="saveAdminScriptUrl()"
+              class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition">
+              Lưu Link & Đồng Bộ Ngay
+            </button>
+            <button onclick="switchTab('post')"
+              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold transition">
+              Đăng Pass Nhanh
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2.5 text-xs">
+          <h3 class="font-extrabold text-slate-200 uppercase">Khóa SĐT Vi Phạm (Chặn Đăng, Giữ Chỗ & Săn Size)</h3>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="banPhoneInput" type="tel" placeholder="SĐT cần khóa..."
+              class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 flex-1" />
+            <input id="banReasonInput" type="text" placeholder="Lý do..."
+              class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 flex-1" />
+            <button onclick="handleBanPhone()"
+              class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold whitespace-nowrap">
+              Khóa SĐT
+            </button>
+          </div>
+          <div id="blacklistContainer" class="space-y-1.5 pt-1"></div>
+        </div>
+
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2 text-xs">
+          <h3 class="font-extrabold text-slate-200 uppercase">Nhật Ký Giao Dịch & Phí 10%</h3>
+          <div id="logsContainer" class="space-y-2 max-h-64 overflow-y-auto"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-slate-900/60 py-3 px-3.5 text-[11px] text-slate-400">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <span>© GIÀY LƯỚT BMT • Sàn Kèo Giày Cũ Đắk Lắk</span>
+      <span>Hotline/Zalo: <strong class="text-orange-400">0906.075.077</strong> • SHB: <strong class="text-slate-200">7772345999 (NGUYEN UNG)</strong></span>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL: DETAIL & 90-MIN LOCK ==================== -->
+  <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-auto">
+      <div class="relative h-64 bg-slate-800">
+        <img id="modalMainImg" src="" class="w-full h-full object-cover" />
+        <span id="modalStatusBadge" class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow">
+          Đang bán
+        </span>
+        <button onclick="closeDetailModal()"
+          class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-slate-200 flex items-center justify-center hover:bg-rose-600 hover:text-white border border-slate-700 transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div id="modalThumbnails" class="absolute bottom-3 left-3 flex gap-2"></div>
+      </div>
+
+      <div class="p-4 space-y-3 text-xs">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span id="modalCat" class="text-[10px] font-extrabold uppercase text-orange-400"></span>
+            <h3 id="modalTitle" class="text-base font-extrabold text-white"></h3>
+          </div>
+          <span id="modalPrice" class="text-lg font-black text-orange-400 whitespace-nowrap"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700/80 text-[11px]">
+          <p class="text-slate-400">Size: <strong id="modalSize" class="text-slate-100"></strong></p>
+          <p class="text-slate-400">Tình trạng: <strong id="modalCond" class="text-slate-100"></strong></p>
+          <p class="text-slate-400">Khu vực: <strong id="modalLoc" class="text-slate-100"></strong></p>
+          <p class="text-slate-400">Người bán: <strong id="modalSeller" class="text-slate-100"></strong></p>
+        </div>
+
+        <p id="modalNote" class="text-slate-300 bg-slate-800/50 p-2.5 rounded-xl border border-slate-800"></p>
+
+        <div id="modalTimerBox" class="hidden bg-amber-500/15 border border-amber-500/40 p-3 rounded-2xl text-amber-200 space-y-1">
+          <p class="font-extrabold text-amber-400"><i class="fa-solid fa-hourglass-half mr-1"></i> ĐANG GIỮ CHỖ 90 PHÚT</p>
+          <p>Khách đang chốt: <strong id="modalBuyerPhone" class="text-white"></strong></p>
+          <p>Thời gian còn lại: <strong id="modalCountdownText" class="text-amber-300"></strong></p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-1">
+          <button id="btnReserveAction" onclick="reserveCurrentProduct()"
+            class="col-span-3 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-wide transition">
+            <i class="fa-solid fa-lock mr-1"></i> Giữ Chỗ 90 Phút
+          </button>
+
+          <button id="btnCallSeller" type="button" onclick="handleContactAction('call')"
+            class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center transition">
+            <i class="fa-solid fa-phone mr-1"></i> Gọi Điện
+          </button>
+
+          <button id="btnZaloSeller" type="button" onclick="handleContactAction('zalo')"
+            class="py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-center transition">
+            <i class="fa-solid fa-comment-dots mr-1"></i> Zalo
+          </button>
+
+          <button type="button" onclick="shareCurrentShoe()"
+            class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-center transition">
+            <i class="fa-solid fa-qrcode mr-1"></i> QR / Share
+          </button>
+        </div>
+
+        <div id="sellerAdminControls" class="hidden pt-2 border-t border-slate-800 grid grid-cols-2 gap-2">
+          <button onclick="confirmSoldAndCloseQR()"
+            class="py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600 hover:text-white font-bold transition">
+            <i class="fa-solid fa-check-circle mr-1"></i> Đã Bán
+          </button>
+
+          <button onclick="triggerReopenProduct()"
+            class="py-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500 hover:text-white font-bold transition">
+            <i class="fa-solid fa-unlock mr-1"></i> Mở Bán Lại
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: VIETQR 10% FEE ==================== -->
+  <div id="vietQrModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 text-center space-y-3 shadow-2xl">
+      <h3 class="text-sm font-extrabold text-white">THANH TOÁN PHÍ KẾT NỐI 10%</h3>
+      <p class="text-xs text-slate-400">Phí sàn (tối thiểu 10.000đ): <strong id="feeAmountText" class="text-orange-400 text-sm"></strong></p>
+      <div class="bg-white p-3 rounded-2xl inline-block">
+        <img id="vietQrImg" src="" class="w-48 h-48 mx-auto" />
+      </div>
+      <div class="flex gap-2 pt-2 text-xs">
+        <button onclick="closeVietQrModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-bold">Đóng</button>
+        <button onclick="finishSoldProcess()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold">Xác Nhận Đã Bán</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ADD SIZE ALERT ==================== -->
+  <div id="addAlertModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 space-y-3 text-xs shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-extrabold text-white">ĐĂNG KÝ SĂN SIZE</h3>
+        <button onclick="closeAddAlertModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div>
+        <label class="block text-slate-300 font-bold mb-1">Số điện thoại / Zalo *</label>
+        <input id="alertPhoneInput" type="tel" placeholder="09xxxxxxxx" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
+      </div>
+      <div>
+        <label class="block text-slate-300 font-bold mb-1">Bộ môn</label>
+        <select id="alertCatInput" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100">
+          <option value="Bóng đá">Bóng đá</option>
+          <option value="Chạy bộ">Chạy bộ</option>
+          <option value="Cầu lông">Cầu lông</option>
+          <option value="Bóng rổ">Bóng rổ</option>
+          <option value="Tennis/Pickleball">Tennis/Pickleball</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-slate-300 font-bold mb-1">Size cần tìm *</label>
+        <input id="alertSizeInput" type="text" placeholder="VD: 41" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100" />
+      </div>
+      <button onclick="submitAlertRegistration()" class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold">
+        Lưu Yêu Cầu Săn Size
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: SHARE LINK & QR CODE ==================== -->
+  <div id="shareModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 text-center space-y-3 text-xs shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 id="shareModalTitle" class="text-sm font-extrabold text-white">CHIA SẺ LINK & MÃ QR</h3>
+        <button onclick="closeShareModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p id="shareModalDesc" class="text-slate-400"></p>
+      <div class="bg-white p-3 rounded-2xl inline-block">
+        <img id="shareQrImg" src="" class="w-44 h-44 mx-auto" />
+      </div>
+      <div class="flex gap-1.5">
+        <input id="shareUrlInput" readonly type="text" class="flex-grow bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-200 text-[11px]" />
+        <button onclick="copyShareLink()" class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold">Copy</button>
+      </div>
+      <button onclick="nativeShareApi()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold">
+        Gửi Link Cho Bạn Bè
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_CODE = "204201504042019";
+    const SHB_ACCOUNT = "7772345999";
+    const SHB_NAME = "NGUYEN UNG";
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzwZivoKG2ppSq0bCqD_DZmETComatIbNHz7gVpNpF-OivsxJ6JhIwF5OYzJW9p3XP8Q/exec";
+
+    let savedUrl = localStorage.getItem('giayluot_script_url');
+    let currentScriptUrl = (savedUrl && savedUrl.includes('/exec')) ? savedUrl.trim() : DEFAULT_SCRIPT_URL;
+    localStorage.setItem('giayluot_script_url', currentScriptUrl);
+
+    let activePhone = localStorage.getItem('giayluot_user_phone') || "";
+
+    let products = [];
+    let alerts = [];
+    let blacklist = [];
+    let logs = [];
+
+    let tempPhoto1 = "";
+    let tempPhoto2 = "";
+
+    let selectedCategory = "ALL";
+    let selectedSize = "ALL";
+
+    let currentDetailId = null;
+    let timerInterval = null;
+
+    function isAdminSession() {
+      return String(activePhone || "").replace(/\D/g, "") === ADMIN_CODE;
+    }
+
+    function isPhoneBanned(phone) {
+      const norm = normalizePhone(phone);
+      if (!norm) return false;
+      const bannedSet = new Set(blacklist.map(b => normalizePhone(b)));
+      return bannedSet.has(norm);
+    }
+
+    function getCurrentViewerPhone() {
+      const inputVal = normalizePhone(document.getElementById('userPhoneInput')?.value || "");
+      if (inputVal) return inputVal;
+      return normalizePhone(activePhone || "");
+    }
+
+    function maskPhoneNumber(phone) {
+      const clean = String(phone || "").replace(/\D/g, "");
+      if (!clean) return "Đang ẩn";
+      if (clean.length <= 6) return clean.slice(0, 2) + "***" + clean.slice(-1);
+      return clean.slice(0, 4) + "***" + clean.slice(-3);
+    }
+
+    function setCloudStatus(state, text) {
+      const badge = document.getElementById('cloudStatusBadge');
+      if (!badge) return;
+      if (state === 'ok') {
+        badge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${text || 'Đã nối Google Sheets'}`;
+      } else if (state === 'err') {
+        badge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[10px] font-bold";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> ${text || 'Lỗi đồng bộ'}`;
+      } else {
+        badge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> ${text || 'Đang đồng bộ...'}`;
+      }
+    }
+
+    window.onload = function() {
+      if (activePhone) {
+        document.getElementById('userPhoneInput').value = activePhone;
+        if (!isAdminSession()) {
+          document.getElementById('postSellerPhone').value = activePhone;
+        }
+      }
+      loadLocalCache();
+      renderMarket();
+      renderAlerts();
+      renderMyShoes();
+      checkAdminLock();
+      syncWithCloud(false);
+
+      const shoeId = new URLSearchParams(window.location.search).get('id');
+      if (shoeId) setTimeout(() => openDetailModal(shoeId), 600);
+
+      setInterval(() => syncWithCloud(false), 45000);
+      setInterval(checkExpiredLocks, 10000);
+    };
+
+    function normalizePhone(phone) {
+      let digits = String(phone || "").replace(/\D/g, "");
+      if (!digits) return "";
+      if (digits === ADMIN_CODE) return ADMIN_CODE;
+      if (digits.startsWith("84") && digits.length >= 10 && digits.length <= 11) {
+        digits = "0" + digits.slice(2);
+      } else if (!digits.startsWith("0") && digits.length === 9) {
+        digits = "0" + digits;
+      }
+      return digits;
+    }
+
+    function calcFee10(price) {
+      return Math.max(10000, Math.round(Number(price || 0) * 0.1));
+    }
+
+    function formatVND(amount) {
+      return Number(amount || 0).toLocaleString('vi-VN') + 'đ';
+    }
+
+    function updateUserPhone(val) {
+      const cleaned = normalizePhone(val);
+      if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
+        alert('SĐT này đã bị khóa do vi phạm quy định sàn! Bạn không thể đăng tin, giữ chỗ hoặc săn size.');
+      }
+      activePhone = cleaned;
+      localStorage.setItem('giayluot_user_phone', activePhone);
+      if (activePhone && !isAdminSession()) {
+        document.getElementById('postSellerPhone').value = activePhone;
+      }
+      checkAdminLock();
+      renderMarket();
+      renderMyShoes();
+    }
+
+    function savePhoneFromInput() {
+      const rawInput = document.getElementById('userPhoneInput').value;
+      const cleaned = normalizePhone(rawInput);
+      if (cleaned && cleaned !== ADMIN_CODE && isPhoneBanned(cleaned)) {
+        alert('SĐT này đang bị khóa trên sàn! Bạn không thể đăng tin, giữ chỗ hoặc săn size.');
+        return;
+      }
+      updateUserPhone(cleaned);
+      alert(isAdminSession() ? 'Đã xác nhận quyền Quản Trị Viên!' : 'Đã lưu SĐT: ' + (activePhone || 'Trống'));
+    }
+
+    function loadLocalCache() {
+      try {
+        const cachedProd = localStorage.getItem('giayluot_cache_products');
+        if (cachedProd) products = JSON.parse(cachedProd);
+        const cachedAlerts = localStorage.getItem('giayluot_cache_alerts');
+        if (cachedAlerts) alerts = JSON.parse(cachedAlerts);
+        const cachedBlack = localStorage.getItem('giayluot_cache_blacklist');
+        if (cachedBlack) blacklist = JSON.parse(cachedBlack);
+      } catch (e) {
+        console.error("Local cache parse error", e);
+      }
+    }
+
+    function saveLocalCache() {
+      localStorage.setItem('giayluot_cache_products', JSON.stringify(products));
+      localStorage.setItem('giayluot_cache_alerts', JSON.stringify(alerts));
+      localStorage.setItem('giayluot_cache_blacklist', JSON.stringify(blacklist));
+    }
+
+    function openPostTabGuarded() {
+      const viewer = getCurrentViewerPhone();
+      if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
+        alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+        return;
+      }
+      switchTab('post');
+    }
+
+    function switchTab(tabId) {
+      if (tabId === 'post') {
+        const viewer = getCurrentViewerPhone();
+        if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
+          alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+          return;
+        }
+      }
+
+      ['market', 'post', 'alerts', 'my-shoes', 'admin'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        if (btn) {
+          btn.classList.remove('border-orange-500', 'text-orange-400');
+          btn.classList.add('border-transparent', 'text-slate-400');
+        }
+      });
+
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-400');
+        activeBtn.classList.add('border-orange-500', 'text-orange-400');
+      }
+
+      if (tabId === 'market') renderMarket();
+      if (tabId === 'alerts') renderAlerts();
+      if (tabId === 'my-shoes') renderMyShoes();
+      if (tabId === 'admin') checkAdminLock();
+    }
+
+    async function syncWithCloud(isManual = false) {
+      const urlToUse = (currentScriptUrl && currentScriptUrl.startsWith('https://'))
+        ? currentScriptUrl.trim()
+        : DEFAULT_SCRIPT_URL;
+
+      const syncIcon = document.getElementById('syncIcon');
+      if (syncIcon) syncIcon.classList.add('fa-spin');
+      setCloudStatus('loading', 'Đang đồng bộ...');
+
+      try {
+        const sep = urlToUse.indexOf('?') === -1 ? '?' : '&';
+        const res = await fetch(urlToUse + sep + "t=" + Date.now(), {
+          method: 'GET',
+          cache: 'no-store',
+          redirect: 'follow'
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseErr) {
+          throw new Error("Link /exec chưa bật quyền 'Bất kỳ ai'.");
+        }
+
+        if (data && data.status === 'ok') {
+          if (Array.isArray(data.products)) {
+            products = data.products.map(p => ({
+              id: String(p.id || ''),
+              title: String(p.name || p.title || ''),
+              category: String(p.category || 'Bóng đá'),
+              size: String(p.size || ''),
+              condition: String(p.condition || '90%'),
+              price: Number(p.price || 0),
+              location: String(p.location || 'Buôn Ma Thuột'),
+              sellerPhone: normalizePhone(p.sellerPhone),
+              status: String(p.status || 'available').trim().toLowerCase(),
+              description: String(p.note || p.description || ''),
+              photo1: p.photo1 || p.photo || '',
+              photo2: p.photo2 || '',
+              createdAt: p.createdAt || new Date().toLocaleDateString('vi-VN'),
+              lockedUntil: p.lockedUntil ? Number(p.lockedUntil) : null,
+              buyerPhone: normalizePhone(p.buyerPhone)
+            }));
+          }
+
+          if (Array.isArray(data.blacklist)) {
+            const remoteBlack = data.blacklist.map(b => normalizePhone(b)).filter(Boolean);
+            blacklist = Array.from(new Set([...blacklist.map(b => normalizePhone(b)), ...remoteBlack]));
+          }
+          if (Array.isArray(data.alerts)) alerts = data.alerts;
+          if (Array.isArray(data.logs)) logs = data.logs;
+
+          saveLocalCache();
+          checkExpiredLocks();
+          renderMarket();
+          renderAlerts();
+          renderMyShoes();
+          renderAdminData();
+          setCloudStatus('ok', 'Đã nối Google Sheets');
+
+          if (isManual) {
+            const availCount = products.filter(x => x.status === 'available' || x.status === 'negotiating').length;
+            alert(`Đã đồng bộ thành công từ Google Sheets (${availCount} tin đang mở / tổng ${products.length} tin).`);
+          }
+        } else {
+          setCloudStatus('err', 'Lỗi Apps Script');
+          if (isManual) alert("Apps Script trả về lỗi: " + (data && data.message ? data.message : "Không rõ"));
+        }
+      } catch (err) {
+        console.warn("Sync failed", err);
+        setCloudStatus('err', 'Chưa nối được Sheet');
+        if (isManual) alert("Không tải được dữ liệu: " + (err && err.message ? err.message : err));
+      } finally {
+        if (syncIcon) syncIcon.classList.remove('fa-spin');
+      }
+    }
+
+    async function postToCloud(payload) {
+      const urlToUse = (currentScriptUrl && currentScriptUrl.startsWith('https://'))
+        ? currentScriptUrl.trim()
+        : DEFAULT_SCRIPT_URL;
+      if (!urlToUse) return;
+      try {
+        const jsonStr = JSON.stringify(payload);
+        if (jsonStr.length < 4000) {
+          const sep = urlToUse.indexOf('?') === -1 ? '?' : '&';
+          const url = urlToUse + sep + 'payload=' + encodeURIComponent(jsonStr) + '&t=' + Date.now();
+          await fetch(url, { method: 'GET', cache: 'no-store', redirect: 'follow' });
+        } else {
+          await fetch(urlToUse, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: jsonStr
+          });
+        }
+        setTimeout(() => syncWithCloud(false), 1800);
+      } catch (e) {
+        console.error("POST cloud error", e);
+        setCloudStatus('err', 'Lỗi gửi dữ liệu');
+      }
+    }
+
+    function manualSync() { syncWithCloud(true); }
+
+    function checkExpiredLocks() {
+      const now = Date.now();
+      let updated = false;
+      products.forEach(p => {
+        if (p.status === 'negotiating' && p.lockedUntil && now > p.lockedUntil) {
+          p.status = 'available';
+          p.lockedUntil = null;
+          p.buyerPhone = null;
+          updated = true;
+        }
+      });
+      if (updated) {
+        saveLocalCache();
+        renderMarket();
+        renderMyShoes();
+      }
+    }
+
+    function setCategoryFilter(cat) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.remove('bg-orange-500', 'text-white', 'font-bold');
+        btn.classList.add('bg-slate-800', 'border', 'border-slate-700', 'text-slate-300', 'font-medium');
+      });
+      const active = document.getElementById(`catBtn-${cat}`);
+      if (active) {
+        active.classList.remove('bg-slate-800', 'border', 'border-slate-700', 'text-slate-300', 'font-medium');
+        active.classList.add('bg-orange-500', 'text-white', 'font-bold');
+      }
+      renderMarket();
+    }
+
+    function setSizeFilter(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('bg-orange-500', 'text-white', 'font-bold');
+        btn.classList.add('bg-slate-800', 'border', 'border-slate-700', 'text-slate-300', 'font-semibold');
+      });
+      const active = document.getElementById(`sizeBtn-${size}`);
+      if (active) {
+        active.classList.remove('bg-slate-800', 'border', 'border-slate-700', 'text-slate-300', 'font-semibold');
+        active.classList.add('bg-orange-500', 'text-white', 'font-bold');
+      }
+      renderMarket();
+    }
+
+    function renderMarket() {
+      const grid = document.getElementById('marketGrid');
+      const emptyState = document.getElementById('emptyState');
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      const visibleProducts = products.filter(p => {
+        if (p.status === 'banned') return false;
+        if (isPhoneBanned(p.sellerPhone)) return false;
+        if (statusFilter === 'ALL' && p.status === 'sold') return false;
+        if (statusFilter === 'available' && p.status !== 'available') return false;
+        if (statusFilter === 'negotiating' && p.status !== 'negotiating') return false;
+        if (statusFilter === 'sold' && p.status !== 'sold') return false;
+
+        if (
+          search &&
+          !p.title.toLowerCase().includes(search) &&
+          !p.category.toLowerCase().includes(search) &&
+          !p.location.toLowerCase().includes(search)
+        ) return false;
+
+        if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
+        if (selectedSize !== 'ALL' && String(p.size).replace(/\D/g, '') !== String(selectedSize)) return false;
+        return true;
+      });
+
+      document.getElementById('badgeMarketCount').innerText = visibleProducts.length;
+      if (visibleProducts.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = visibleProducts.map(p => {
+        const isReserved = p.status === 'negotiating';
+        const isSold = p.status === 'sold';
+        const img = p.photo1 || 'https://placehold.co/400x300/1e293b/94a3b8?text=GIAY+LUOT+BMT';
+        let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow">Đang bán</span>`;
+        if (isReserved) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow">Giữ chỗ 90p</span>`;
+        else if (isSold) statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow">Đã bán</span>`;
+
+        return `
+          <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-orange-500/70 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+            <div class="relative w-full h-48 bg-slate-800 overflow-hidden">
+              <img src="${img}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              <div class="absolute top-2.5 left-2.5">${statusBadge}</div>
+              <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-950/90 border border-slate-700 text-white">EU ${p.size}</span>
+            </div>
+            <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+              <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">${p.category}</p>
+                <h3 class="font-extrabold text-sm text-white line-clamp-1 mt-0.5">${p.title}</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>${p.location} • ${p.condition}</p>
+              </div>
+              <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                  <span class="block text-[10px] text-slate-500">Giá pass</span>
+                  <span class="text-sm font-black text-orange-400">${formatVND(p.price)}</span>
+                </div>
+                <span class="text-xs font-bold text-slate-400 group-hover:text-orange-400">Xem tin →</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openDetailModal(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      currentDetailId = id;
+      const modal = document.getElementById('detailModal');
+      const mainImg = document.getElementById('modalMainImg');
+      const thumbBox = document.getElementById('modalThumbnails');
+      mainImg.src = p.photo1 || 'https://placehold.co/400x300/1e293b/94a3b8?text=GIAY+LUOT+BMT';
+      thumbBox.innerHTML = '';
+      if (p.photo1) thumbBox.innerHTML += `<img src="${p.photo1}" onclick="document.getElementById('modalMainImg').src='${p.photo1}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
+      if (p.photo2) thumbBox.innerHTML += `<img src="${p.photo2}" onclick="document.getElementById('modalMainImg').src='${p.photo2}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
+
+      const viewerNorm = getCurrentViewerPhone();
+      const isAdmin = isAdminSession();
+      const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
+      const isCurrentBuyer = Boolean(viewerNorm && !isAdmin && p.buyerPhone && normalizePhone(p.buyerPhone) === viewerNorm);
+      const isReserved = p.status === 'negotiating';
+
+      document.getElementById('modalCat').innerText = p.category;
+      document.getElementById('modalTitle').innerText = p.title;
+      document.getElementById('modalPrice').innerText = formatVND(p.price);
+      document.getElementById('modalSize').innerText = p.size;
+      document.getElementById('modalCond').innerText = p.condition;
+      document.getElementById('modalLoc').innerText = p.location;
+      document.getElementById('modalSeller').innerText = (isSeller || isAdmin || !isReserved)
+        ? (p.sellerPhone || 'Chưa có SĐT')
+        : maskPhoneNumber(p.sellerPhone);
+      document.getElementById('modalNote').innerText = p.description ? `Ghi chú: ${p.description}` : 'Không có ghi chú thêm.';
+
+      const statusBadge = document.getElementById('modalStatusBadge');
+      if (isReserved) {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500 text-white shadow";
+        statusBadge.innerText = "Giữ chỗ 90 phút";
+      } else if (p.status === 'sold') {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-600 text-white shadow";
+        statusBadge.innerText = "Đã bán";
+      } else {
+        statusBadge.className = "absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow";
+        statusBadge.innerText = "Đang bán";
+      }
+
+      const callBtn = document.getElementById('btnCallSeller');
+      const zaloBtn = document.getElementById('btnZaloSeller');
+      const canContactSeller = !isReserved || isSeller || isAdmin;
+
+      if (canContactSeller) {
+        callBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        callBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        callBtn.innerHTML = `<i class="fa-solid fa-phone mr-1"></i> Gọi Điện`;
+
+        zaloBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        zaloBtn.classList.add('bg-sky-600', 'hover:bg-sky-700');
+        zaloBtn.innerHTML = `<i class="fa-solid fa-comment-dots mr-1"></i> Zalo`;
+      } else {
+        callBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        callBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        callBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Đang giữ chỗ`;
+
+        zaloBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        zaloBtn.classList.remove('bg-sky-600', 'hover:bg-sky-700');
+        zaloBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Tạm khóa`;
+      }
+
+      const timerBox = document.getElementById('modalTimerBox');
+      const reserveBtn = document.getElementById('btnReserveAction');
+      if (isReserved && p.lockedUntil) {
+        timerBox.classList.remove('hidden');
+        document.getElementById('modalBuyerPhone').innerText = (isCurrentBuyer || isAdmin || isSeller)
+          ? (p.buyerPhone || 'Đang ẩn')
+          : maskPhoneNumber(p.buyerPhone);
+        reserveBtn.classList.add('hidden');
+        startCountdown(p.lockedUntil);
+      } else {
+        timerBox.classList.add('hidden');
+        reserveBtn.classList.toggle('hidden', p.status === 'sold');
+        if (timerInterval) clearInterval(timerInterval);
+      }
+
+      document.getElementById('sellerAdminControls').classList.toggle('hidden', !(isSeller || isAdmin));
+      modal.classList.remove('hidden');
+    }
+
+    function handleContactAction(type) {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p) return;
+
+      const viewerNorm = getCurrentViewerPhone();
+      const isAdmin = isAdminSession();
+      const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
+      const isReserved = p.status === 'negotiating';
+
+      if (isReserved && !isSeller && !isAdmin) {
+        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo người bán để tránh làm gián đoạn giao dịch.');
+        return;
+      }
+
+      if (!p.sellerPhone) {
+        alert('Tin đăng chưa có SĐT người bán.');
+        return;
+      }
+
+      if (type === 'call') {
+        window.location.href = `tel:${p.sellerPhone}`;
+      } else if (type === 'zalo') {
+        window.open(`https://zalo.me/${p.sellerPhone}`, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+      if (timerInterval) clearInterval(timerInterval);
+    }
+
+    function startCountdown(untilTimestamp) {
+      if (timerInterval) clearInterval(timerInterval);
+      function update() {
+        const diff = untilTimestamp - Date.now();
+        if (diff <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('modalCountdownText').innerText = "ĐÃ HẾT GIỜ GIỮ CHỖ";
+          checkExpiredLocks();
+          return;
+        }
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('modalCountdownText').innerText = `${m} phút ${s < 10 ? '0' : ''}${s} giây`;
+      }
+      update();
+      timerInterval = setInterval(update, 1000);
+    }
+
+    async function reserveCurrentProduct() {
+      const viewerCheck = getCurrentViewerPhone();
+      if (viewerCheck && viewerCheck !== ADMIN_CODE && isPhoneBanned(viewerCheck)) {
+        alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+        return;
+      }
+
+      if (!activePhone || isAdminSession()) {
+        const phone = prompt("Nhập SĐT của bạn để giữ chỗ 90 phút:");
+        if (!phone) return;
+        const norm = normalizePhone(phone);
+        if (!norm || norm === ADMIN_CODE) {
+          alert('Vui lòng nhập số điện thoại hợp lệ!');
+          return;
+        }
+        if (isPhoneBanned(norm)) {
+          alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+          return;
+        }
+        updateUserPhone(norm);
+      }
+
+      if (isPhoneBanned(activePhone)) {
+        alert('SĐT này đang bị khóa trên sàn, không thể giữ chỗ!');
+        return;
+      }
+
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p || p.status !== 'available') {
+        alert('Đôi giày này hiện không còn ở trạng thái mở giữ chỗ.');
+        return;
+      }
+
+      p.status = 'negotiating';
+      p.lockedUntil = Date.now() + (90 * 60 * 1000);
+      p.buyerPhone = activePhone;
+      saveLocalCache();
+      renderMarket();
+      renderMyShoes();
+      openDetailModal(p.id);
+
+      await postToCloud({
+        action: 'CONNECT_BUYER',
+        productId: p.id,
+        buyerPhone: activePhone,
+        sellerPhone: p.sellerPhone,
+        price: p.price,
+        productName: p.title
+      });
+      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}`);
+    }
+
+    function confirmSoldAndCloseQR() {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p) return;
+      const fee = calcFee10(p.price);
+      document.getElementById('vietQrImg').src = `https://img.vietqr.io/image/SHB-${SHB_ACCOUNT}-compact2.png?amount=${fee}&addInfo=FEE%20${p.id}&accountName=${encodeURIComponent(SHB_NAME)}`;
+      document.getElementById('feeAmountText').innerText = formatVND(fee);
+      document.getElementById('vietQrModal').classList.remove('hidden');
+    }
+
+    function closeVietQrModal() { document.getElementById('vietQrModal').classList.add('hidden'); }
+
+    async function finishSoldProcess() {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p) return;
+      p.status = 'sold';
+      saveLocalCache();
+      closeVietQrModal();
+      closeDetailModal();
+      renderMarket();
+      renderMyShoes();
+      await postToCloud({ action: 'UPDATE_STATUS', productId: p.id, newStatus: 'sold', buyerPhone: p.buyerPhone });
+      alert('Đã cập nhật trạng thái: Đã bán.');
+    }
+
+    async function triggerReopenProduct() {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p || !confirm('Mở bán lại đôi giày này?')) return;
+      p.status = 'available';
+      p.lockedUntil = null;
+      p.buyerPhone = null;
+      saveLocalCache();
+      openDetailModal(p.id);
+      renderMarket();
+      await postToCloud({ action: 'UPDATE_STATUS', productId: p.id, newStatus: 'available' });
+    }
+
+    function handleImageCompress(event, slot) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          const MAX_WIDTH = 380;
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+          if (slot === 1) {
+            tempPhoto1 = compressedDataUrl;
+            document.getElementById('prevPhoto1').src = compressedDataUrl;
+            document.getElementById('prevPhoto1').classList.remove('hidden');
+            document.getElementById('placeholder1').classList.add('hidden');
+          } else {
+            tempPhoto2 = compressedDataUrl;
+            document.getElementById('prevPhoto2').src = compressedDataUrl;
+            document.getElementById('prevPhoto2').classList.remove('hidden');
+            document.getElementById('placeholder2').classList.add('hidden');
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handlePostSubmit(e) {
+      e.preventDefault();
+      const sellerPhone = normalizePhone(document.getElementById('postSellerPhone').value);
+      const viewerPhone = getCurrentViewerPhone();
+
+      if (!sellerPhone || sellerPhone === ADMIN_CODE) {
+        alert('Vui lòng nhập SĐT người bán hợp lệ!');
+        return;
+      }
+      if (isPhoneBanned(sellerPhone) || (viewerPhone && viewerPhone !== ADMIN_CODE && isPhoneBanned(viewerPhone))) {
+        alert('SĐT này đang bị khóa trên sàn, không thể đăng tin mới!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitPost');
+      if (btn) { btn.disabled = true; btn.innerText = "Đang gửi lên Google Sheets..."; }
+
+      const newProduct = {
+        id: "BMT-" + Date.now(),
+        title: document.getElementById('postName').value.trim(),
+        category: document.getElementById('postCategory').value,
+        size: document.getElementById('postSize').value.trim(),
+        price: Number(document.getElementById('postPrice').value),
+        condition: document.getElementById('postCondition').value,
+        location: document.getElementById('postLocation').value.trim(),
+        sellerPhone: sellerPhone,
+        description: document.getElementById('postNote').value.trim(),
+        photo1: tempPhoto1,
+        photo2: tempPhoto2,
+        status: 'available',
+        createdAt: new Date().toLocaleDateString('vi-VN')
+      };
+
+      products.unshift(newProduct);
+      saveLocalCache();
+
+      await postToCloud({
+        action: 'ADD_PRODUCT',
+        product: {
+          id: newProduct.id, name: newProduct.title, category: newProduct.category,
+          size: newProduct.size, condition: newProduct.condition, price: newProduct.price,
+          location: newProduct.location, sellerPhone: newProduct.sellerPhone,
+          note: newProduct.description, photo1: newProduct.photo1, photo2: newProduct.photo2,
+          createdAt: newProduct.createdAt
+        }
+      });
+
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Đăng Pass Lên Sàn'; }
+      document.getElementById('postForm').reset();
+      tempPhoto1 = ""; tempPhoto2 = "";
+      document.getElementById('prevPhoto1').classList.add('hidden');
+      document.getElementById('placeholder1').classList.remove('hidden');
+      document.getElementById('prevPhoto2').classList.add('hidden');
+      document.getElementById('placeholder2').classList.remove('hidden');
+
+      if (!isAdminSession()) updateUserPhone(sellerPhone);
+      alert('Đã đăng pass lên sàn và gửi đồng bộ Google Sheets!');
+      switchTab('market');
+    }
+
+    function getShareableBaseUrl() {
+      if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || !window.location.origin) {
+        return "https://giayluotbmt.github.io/";
+      }
+      return window.location.origin + window.location.pathname;
+    }
+
+    function openShareModal() {
+      const baseUrl = getShareableBaseUrl();
+      document.getElementById('shareModalTitle').innerText = "CHIA SẺ SÀN & MÃ QR";
+      document.getElementById('shareModalDesc').innerText = "Quét mã QR hoặc gửi link cho bạn bè mở sàn Giày Lướt BMT.";
+      document.getElementById('shareUrlInput').value = baseUrl;
+      document.getElementById('shareQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(baseUrl)}`;
+      document.getElementById('shareModal').classList.remove('hidden');
+    }
+
+    function shareCurrentShoe() {
+      const p = products.find(x => x.id === currentDetailId);
+      if (!p) return;
+      const shoeUrl = `${getShareableBaseUrl()}?id=${p.id}`;
+      document.getElementById('shareModalTitle').innerText = `QR ĐÔI: ${p.title}`;
+      document.getElementById('shareModalDesc').innerText = `Quét QR để xem trực tiếp đôi ${p.title} (Size ${p.size}).`;
+      document.getElementById('shareUrlInput').value = shoeUrl;
+      document.getElementById('shareQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(shoeUrl)}`;
+      document.getElementById('shareModal').classList.remove('hidden');
+    }
+
+    function closeShareModal() { document.getElementById('shareModal').classList.add('hidden'); }
+
+    function copyShareLink() {
+      const input = document.getElementById('shareUrlInput');
+      input.select();
+      document.execCommand('copy');
+      alert('Đã sao chép đường link!');
+    }
+
+    function nativeShareApi() {
+      const url = document.getElementById('shareUrlInput').value;
+      if (navigator.share) navigator.share({ title: 'GIÀY LƯỚT BMT - Sàn Giày Thể Thao Buôn Ma Thuột', url }).catch(() => {});
+      else copyShareLink();
+    }
+
+    function openAddAlertModal() {
+      const viewer = getCurrentViewerPhone();
+      if (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer)) {
+        alert('SĐT này đang bị khóa trên sàn, không thể đăng ký săn size!');
+        return;
+      }
+      if (activePhone && !isAdminSession()) document.getElementById('alertPhoneInput').value = activePhone;
+      document.getElementById('addAlertModal').classList.remove('hidden');
+    }
+
+    function closeAddAlertModal() { document.getElementById('addAlertModal').classList.add('hidden'); }
+
+    async function submitAlertRegistration() {
+      const phone = normalizePhone(document.getElementById('alertPhoneInput').value);
+      const cat = document.getElementById('alertCatInput').value;
+      const size = document.getElementById('alertSizeInput').value.trim();
+      const viewer = getCurrentViewerPhone();
+
+      if (!phone || phone === ADMIN_CODE || !size) {
+        alert('Vui lòng điền đủ SĐT hợp lệ và Size!');
+        return;
+      }
+      if (isPhoneBanned(phone) || (viewer && viewer !== ADMIN_CODE && isPhoneBanned(viewer))) {
+        alert('SĐT này đang bị khóa trên sàn, không thể đăng ký săn size!');
+        return;
+      }
+      const newAlert = { id: "ALT-" + Date.now(), phone, category: cat, size, createdAt: new Date().toLocaleDateString('vi-VN') };
+      alerts.unshift(newAlert);
+      saveLocalCache();
+      closeAddAlertModal();
+      renderAlerts();
+      await postToCloud({ action: 'ADD_ALERT', phone, category: cat, size });
+      alert('Đã lưu yêu cầu săn size!');
+    }
+
+    function deleteAlert(id) {
+      alerts = alerts.filter(a => a.id !== id);
+      saveLocalCache();
+      renderAlerts();
+    }
+
+    function renderAlerts() {
+      const list = document.getElementById('alertsList');
+      document.getElementById('badgeAlertsCount').innerText = alerts.length;
+      if (alerts.length === 0) {
+        list.innerHTML = `<div class="text-center py-8 bg-slate-900 rounded-2xl border border-slate-800 text-slate-400 text-xs">Chưa có yêu cầu săn size nào. Bấm "Đăng ký săn size" để tạo mới.</div>`;
+        return;
+      }
+      list.innerHTML = alerts.map(a => `
+        <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+            <div>
+              <p class="font-extrabold text-slate-100">${a.category} • Size <span class="text-orange-400 font-black">${a.size}</span></p>
+              <p class="text-[11px] text-slate-400">SĐT: ${a.phone} • ${a.createdAt || ''}</p>
+            </div>
+          </div>
+          <button onclick="deleteAlert('${a.id}')" class="p-2 text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      `).join('');
+    }
+
+    function renderMyShoes() {
+      const grid = document.getElementById('myShoesGrid');
+      document.getElementById('badgeMyCount').innerText = '0';
+      if (!activePhone || isAdminSession()) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-10 bg-slate-900 rounded-2xl border border-slate-800 text-xs text-slate-400 space-y-1.5"><i class="fa-solid fa-phone text-xl text-slate-600"></i><p>Nhập SĐT của bạn ở thanh trên cùng để xem tin đăng hoặc giữ chỗ.</p></div>`;
+        return;
+      }
+      const myPhoneNorm = normalizePhone(activePhone);
+      const myItems = products.filter(p => normalizePhone(p.sellerPhone) === myPhoneNorm || normalizePhone(p.buyerPhone) === myPhoneNorm);
+      document.getElementById('badgeMyCount').innerText = myItems.length;
+      if (myItems.length === 0) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-10 bg-slate-900 rounded-2xl border border-slate-800 text-xs text-slate-400">Chưa có tin đăng hoặc giữ chỗ nào gắn với SĐT <strong class="text-white">${activePhone}</strong>.</div>`;
+        return;
+      }
+      grid.innerHTML = myItems.map(p => {
+        const isMyPost = normalizePhone(p.sellerPhone) === myPhoneNorm;
+        return `
+          <div onclick="openDetailModal('${p.id}')" class="bg-slate-900 p-3 rounded-2xl border border-slate-800 flex items-center gap-3 cursor-pointer hover:border-orange-500/70 transition shadow-md">
+            <img src="${p.photo1 || 'https://placehold.co/100x100/1e293b/94a3b8?text=GIAY'}" class="w-16 h-16 rounded-xl object-cover">
+            <div class="flex-grow space-y-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isMyPost ? 'bg-orange-500/20 text-orange-300' : 'bg-sky-500/20 text-sky-300'}">${isMyPost ? 'Tin của tôi' : 'Đang giữ chỗ'}</span>
+                <span class="text-[11px] font-semibold text-slate-400">${p.status}</span>
+              </div>
+              <h4 class="font-extrabold text-white line-clamp-1">${p.title}</h4>
+              <p class="text-orange-400 font-black">${formatVND(p.price)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function checkAdminLock() {
+      const isAdmin = isAdminSession();
+      document.getElementById('adminLockedNotice').classList.toggle('hidden', isAdmin);
+      document.getElementById('adminContent').classList.toggle('hidden', !isAdmin);
+      const badge = document.getElementById('adminLockBadge');
+      if (isAdmin) {
+        badge.innerText = "UNLOCKED";
+        badge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold";
+        document.getElementById('adminScriptUrlInput').value = currentScriptUrl;
+        renderAdminData();
+      } else {
+        badge.innerText = "LOCKED";
+        badge.className = "px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[11px] font-bold";
+      }
+    }
+
+    function saveAdminScriptUrl() {
+      const url = document.getElementById('adminScriptUrlInput').value.trim();
+      currentScriptUrl = url || DEFAULT_SCRIPT_URL;
+      localStorage.setItem('giayluot_script_url', currentScriptUrl);
+      alert('Đã lưu Link Cloud & bắt đầu đồng bộ!');
+      syncWithCloud(true);
+    }
+
+    async function handleBanPhone() {
+      if (!isAdminSession()) return;
+      const phone = normalizePhone(document.getElementById('banPhoneInput').value);
+      const reason = document.getElementById('banReasonInput').value.trim() || 'Vi phạm quy định sàn';
+      if (!phone || phone === ADMIN_CODE) return alert('Nhập SĐT hợp lệ cần khóa!');
+      if (!blacklist.includes(phone)) {
+        blacklist.push(phone);
+        saveLocalCache();
+        renderAdminData();
+        renderMarket();
+        document.getElementById('banPhoneInput').value = '';
+        document.getElementById('banReasonInput').value = '';
+        await postToCloud({ action: 'BAN_PHONE', phone, reason });
+        alert(`Đã khóa toàn bộ quyền đăng, giữ chỗ và săn size của SĐT: ${phone}`);
+      } else {
+        alert('SĐT này đã nằm trong danh sách khóa.');
+      }
+    }
+
+    async function unbanPhone(phone) {
+      if (!isAdminSession()) return;
+      blacklist = blacklist.filter(b => normalizePhone(b) !== normalizePhone(phone));
+      saveLocalCache();
+      renderAdminData();
+      renderMarket();
+      await postToCloud({ action: 'UNBAN_PHONE', phone });
+    }
+
+    function renderAdminData() {
+      const blackContainer = document.getElementById('blacklistContainer');
+      blackContainer.innerHTML = blacklist.length === 0
+        ? `<p class="text-[11px] text-slate-500">Chưa có SĐT nào bị khóa.</p>`
+        : blacklist.map(b => `
+            <div class="flex items-center justify-between bg-slate-800 p-2 rounded-xl border border-slate-700 text-xs text-slate-200">
+              <span><i class="fa-solid fa-ban text-rose-400 mr-2"></i>${b}</span>
+              <button onclick="unbanPhone('${b}')" class="text-xs text-slate-400 hover:text-emerald-400 font-bold">Mở khóa</button>
+            </div>
+          `).join('');
+
+      const logsContainer = document.getElementById('logsContainer');
+      logsContainer.innerHTML = logs.length === 0
+        ? `<p class="text-[11px] text-slate-500">Chưa có nhật ký giao dịch.</p>`
+        : logs.map(l => `
+            <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 text-[11px] space-y-1">
+              <div class="flex items-center justify-between font-bold text-slate-100">
+                <span>Mã: ${l.productId || ''}</span>
+                <span class="text-orange-400">${formatVND(l.commission)} (10%)</span>
+              </div>
+              <p class="text-slate-400">Người mua: ${l.buyerPhone || ''} • Người bán: ${l.sellerPhone || ''}</p>
+            </div>
+          `).join('');
+    }
+  </script>
+</body>
+</html>
+
