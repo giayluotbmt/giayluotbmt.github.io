@@ -40,6 +40,12 @@
           </button>
         </div>
 
+        <button onclick="openSizeGuideModal()" title="Đo chân chọn size giày chuẩn"
+          class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-ruler-combined"></i>
+          <span>Đo Size</span>
+        </button>
+
         <button onclick="manualSync()" title="Đồng bộ dữ liệu từ Google Sheets"
           class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
           <i id="syncIcon" class="fa-solid fa-rotate text-orange-400"></i>
@@ -91,7 +97,7 @@
         <i class="fa-solid fa-headset"></i> HOTLINE / ZALO ADMIN: 0906.075.077
       </span>
       <span class="mx-1.5 text-slate-500">•</span>
-      <span>Người mua cọc giữ chỗ 90 phút • Chốt bán thành công chuyển 10% phí cầu nối về tài khoản SHB <strong>7772345999</strong></span>
+      <span>Lưu SĐT & giữ chỗ 90 phút để mở liên hệ • Chốt bán thành công chuyển 10% phí cầu nối về tài khoản SHB <strong>7772345999</strong></span>
     </div>
   </header>
 
@@ -108,6 +114,12 @@
               placeholder="Tìm tên giày, hãng, khu vực (BMT, Cư M'gar, Cumgar, Cư Jút...)"
               class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-500 transition" />
           </div>
+
+          <button type="button" onclick="openSizeGuideModal()"
+            class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 whitespace-nowrap transition">
+            <i class="fa-solid fa-ruler-combined"></i>
+            <span>Đo Chân Chọn Size</span>
+          </button>
 
           <select id="statusFilter" onchange="renderMarket()"
             class="bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-orange-500">
@@ -142,7 +154,6 @@
           <button id="sizeBtn-44" onclick="setSizeFilter('44')" class="size-btn px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:border-orange-500/50 font-semibold text-[11px]">44</button>
         </div>
 
-        <!-- DYNAMIC LOCATION FILTER BAR (AUTO-BUILT & MERGED FROM ACTIVE LISTINGS) -->
         <div id="dynamicLocationBar" class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs"></div>
       </div>
 
@@ -372,6 +383,108 @@
     </div>
   </footer>
 
+  <!-- ==================== MODAL: ĐO CHÂN CHỌN SIZE CHUẨN ==================== -->
+  <div id="sizeGuideModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 space-y-3.5 text-xs shadow-2xl my-auto max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-extrabold text-white"><i class="fa-solid fa-ruler-combined text-emerald-400 mr-1.5"></i>ĐO CHÂN CHỌN SIZE GIÀY CHUẨN</h3>
+          <p class="text-[11px] text-slate-400">Tính size gợi ý theo chiều dài bàn chân (cm) hoặc size đôi đang đi</p>
+        </div>
+        <button onclick="closeSizeGuideModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-2.5 space-y-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-emerald-300">
+          <span><i class="fa-solid fa-shoe-prints mr-1"></i>Sơ đồ hướng dẫn đo: Gót → Ngón dài nhất</span>
+          <span class="text-slate-400 font-normal">Đo cuối ngày</span>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden border border-slate-700">
+          <img src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcTQ2W7csXfRDSqh96EWS0k2oHKYnGspkAz0z5cMHWqNFCNZRG_ZWuls5iChsKjoS0RZBkRIqQBgE3XqkuQ"
+            alt="Sơ đồ hướng dẫn đo chân và đối chiếu size giày"
+            class="w-full h-36 object-contain mx-auto" />
+        </div>
+        <p class="text-[10px] text-slate-300 leading-relaxed">
+          1. Đặt chân lên tờ giấy áp sát tường, đi tất chơi thể thao. 2. Đánh dấu điểm đầu ngón chân dài nhất. 3. Dùng thước đo thẳng từ mép gót tới điểm đánh dấu (cm).
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1.5 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+        <button type="button" id="sgModeCmBtn" onclick="setSizeGuideMode('cm')"
+          class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition">
+          Đo bằng Cm (Chân)
+        </button>
+        <button type="button" id="sgModeEuBtn" onclick="setSizeGuideMode('eu')"
+          class="py-1.5 rounded-lg text-slate-300 hover:text-white font-semibold transition">
+          Đổi từ Size Đang Đi
+        </button>
+      </div>
+
+      <div id="sgCmBox" class="space-y-1.5">
+        <label class="block text-slate-300 font-bold">Chiều dài bàn chân (cm — đo từ gót tới ngón dài nhất):</label>
+        <div class="flex items-center gap-2">
+          <input id="sgFootCmInput" type="number" step="0.1" min="20" max="31" value="25.5" oninput="calculateRecommendedSize()"
+            class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-bold focus:outline-none focus:border-emerald-500" />
+          <span class="text-slate-400 font-bold">cm</span>
+        </div>
+      </div>
+
+      <div id="sgEuBox" class="hidden space-y-1.5">
+        <label class="block text-slate-300 font-bold">Size đôi giày bạn đang đi vừa:</label>
+        <select id="sgCurrentEuInput" onchange="calculateRecommendedSize()"
+          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-bold focus:outline-none focus:border-emerald-500">
+          <option value="36">Size 36</option>
+          <option value="37">Size 37</option>
+          <option value="38">Size 38</option>
+          <option value="39">Size 39</option>
+          <option value="40">Size 40</option>
+          <option value="41" selected>Size 41</option>
+          <option value="42">Size 42</option>
+          <option value="43">Size 43</option>
+          <option value="44">Size 44</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Dáng bàn chân:</label>
+          <select id="sgFootShapeInput" onchange="calculateRecommendedSize()"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+            <option value="normal">Bình thường</option>
+            <option value="wide">Chân bè / mu cao</option>
+            <option value="slim">Chân thon</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Bộ môn chơi:</label>
+          <select id="sgSportInput" onchange="calculateRecommendedSize()"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+            <option value="Bóng đá">⚽ Bóng đá</option>
+            <option value="Chạy bộ">🏃 Chạy bộ</option>
+            <option value="Cầu lông">🏸 Cầu lông</option>
+            <option value="Bóng rổ">🏀 Bóng rổ</option>
+            <option value="Tennis/Pickleball">🎾 Tennis/Pickleball</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/90 border border-emerald-500/30 rounded-2xl p-3.5 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] text-slate-400 font-semibold">Size khuyến nghị trên sàn:</span>
+          <span id="sgResultSizeBadge" class="px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-sm">EU 41</span>
+        </div>
+        <p id="sgResultAdvice" class="text-[11px] text-slate-200 leading-relaxed"></p>
+        <p id="sgMatchingStockText" class="text-[11px] text-emerald-300 font-bold"></p>
+      </div>
+
+      <button type="button" onclick="applyRecommendedSizeToMarket()"
+        class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold uppercase tracking-wide transition">
+        <i class="fa-solid fa-filter mr-1"></i> Lọc Giày Khớp Size Trên Sàn
+      </button>
+    </div>
+  </div>
+
   <!-- ==================== MODAL: DETAIL & 90-MIN LOCK ==================== -->
   <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-auto">
@@ -410,6 +523,10 @@
           <p>Khách đang chốt: <strong id="modalBuyerPhone" class="text-white"></strong></p>
           <p>Thời gian còn lại: <strong id="modalCountdownText" class="text-amber-300"></strong></p>
         </div>
+
+        <p id="contactUnlockHint" class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2">
+          <i class="fa-solid fa-shield-halved mr-1"></i> Lưu SĐT của bạn và bấm <strong>Giữ Chỗ 90 Phút</strong> để mở liên hệ Gọi Điện / Zalo người bán.
+        </p>
 
         <div class="grid grid-cols-3 gap-2 pt-1">
           <button id="btnReserveAction" onclick="reserveCurrentProduct()"
@@ -559,6 +676,123 @@
 
     let currentDetailId = null;
     let timerInterval = null;
+
+    // ==================== ĐO CHÂN CHỌN SIZE CHUẨN ====================
+    let sgMode = 'cm';
+    let sgRecommendedSize = '41';
+
+    function openSizeGuideModal() {
+      if (selectedCategory && selectedCategory !== 'ALL') {
+        const sportSelect = document.getElementById('sgSportInput');
+        if (sportSelect) sportSelect.value = selectedCategory;
+      }
+      if (selectedSize && selectedSize !== 'ALL') {
+        const euSelect = document.getElementById('sgCurrentEuInput');
+        if (euSelect) euSelect.value = selectedSize;
+      }
+      calculateRecommendedSize();
+      document.getElementById('sizeGuideModal').classList.remove('hidden');
+    }
+
+    function closeSizeGuideModal() {
+      document.getElementById('sizeGuideModal').classList.add('hidden');
+    }
+
+    function setSizeGuideMode(mode) {
+      sgMode = mode;
+      const cmBtn = document.getElementById('sgModeCmBtn');
+      const euBtn = document.getElementById('sgModeEuBtn');
+      const cmBox = document.getElementById('sgCmBox');
+      const euBox = document.getElementById('sgEuBox');
+
+      if (mode === 'cm') {
+        cmBtn.className = "py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition";
+        euBtn.className = "py-1.5 rounded-lg text-slate-300 hover:text-white font-semibold transition";
+        cmBox.classList.remove('hidden');
+        euBox.classList.add('hidden');
+      } else {
+        euBtn.className = "py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition";
+        cmBtn.className = "py-1.5 rounded-lg text-slate-300 hover:text-white font-semibold transition";
+        euBox.classList.remove('hidden');
+        cmBox.classList.add('hidden');
+      }
+      calculateRecommendedSize();
+    }
+
+    function footCmToBaseEu(cm) {
+      const val = Number(cm || 25.5);
+      const euRaw = Math.round((val + 1.2) * 1.5 - 14.5);
+      return Math.min(44, Math.max(36, euRaw));
+    }
+
+    function calculateRecommendedSize() {
+      const shape = document.getElementById('sgFootShapeInput')?.value || 'normal';
+      const sport = document.getElementById('sgSportInput')?.value || 'Bóng đá';
+
+      let baseEu = 41;
+      if (sgMode === 'cm') {
+        const cm = parseFloat(document.getElementById('sgFootCmInput')?.value || '25.5');
+        baseEu = footCmToBaseEu(cm);
+      } else {
+        baseEu = parseInt(document.getElementById('sgCurrentEuInput')?.value || '41', 10) || 41;
+      }
+
+      let adjust = 0;
+      if (shape === 'wide') adjust += 1;
+      else if (shape === 'slim') adjust -= 0.5;
+
+      if (sport === 'Chạy bộ') adjust += 0.5;
+      else if (sport === 'Bóng đá') adjust += 0.25;
+
+      const finalEu = Math.min(44, Math.max(36, Math.round(baseEu + adjust)));
+      sgRecommendedSize = String(finalEu);
+
+      const badge = document.getElementById('sgResultSizeBadge');
+      const adviceEl = document.getElementById('sgResultAdvice');
+      const stockEl = document.getElementById('sgMatchingStockText');
+
+      if (badge) badge.innerText = `EU ${sgRecommendedSize}`;
+
+      const sportTips = {
+        'Bóng đá': 'Giày đá banh cần ôm chân để sút và bứt tốc chuẩn; nếu đi tất dày hoặc chân bè nên ưu tiên size nhích lên.',
+        'Chạy bộ': 'Chạy bộ chân dễ nở sau 30–60 phút, nên chừa mũi chân khoảng 0.5 cm để không kích mũi.',
+        'Cầu lông': 'Giày cầu lông cần độ chắc cổ chân và mũi thoải mái khi phanh/đổi hướng nhanh.',
+        'Bóng rổ': 'Giày bóng rổ ưu tiên độ khóa gót và đệm êm, chân bè nên cân nhắc nhích nhẹ.',
+        'Tennis/Pickleball': 'Giày sân vợt cần ôm ngang thân bàn chân để di chuyển ngang không trượt mũi.'
+      };
+
+      const shapeNote = shape === 'wide'
+        ? 'Đã cộng thêm độ thoáng cho dáng chân bè/mu cao.'
+        : (shape === 'slim' ? 'Đã cân chỉnh cho dáng chân thon.' : 'Áp dụng form chân tiêu chuẩn.');
+
+      if (adviceEl) {
+        adviceEl.innerText = `${shapeNote} ${sportTips[sport] || ''}`;
+      }
+
+      const matchingCount = products.filter(p =>
+        (p.status === 'available' || p.status === 'negotiating') &&
+        !isPhoneBanned(p.sellerPhone) &&
+        String(p.size).replace(/\D/g, '') === sgRecommendedSize &&
+        (!sport || p.category === sport)
+      ).length;
+
+      if (stockEl) {
+        stockEl.innerText = matchingCount > 0
+          ? `Hiện có ${matchingCount} đôi ${sport} size ${sgRecommendedSize} đang mở trên sàn!`
+          : `Hiện chưa có đôi ${sport} size ${sgRecommendedSize} mở bán — bạn có thể lọc toàn bộ môn size ${sgRecommendedSize} hoặc đăng ký Săn Size.`;
+      }
+    }
+
+    function applyRecommendedSizeToMarket() {
+      const sport = document.getElementById('sgSportInput')?.value || 'ALL';
+      switchTab('market');
+      if (sport && sport !== 'ALL') {
+        setCategoryFilter(sport);
+      }
+      setSizeFilter(sgRecommendedSize);
+      closeSizeGuideModal();
+      document.getElementById('marketGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     function normalizeAreaText(text) {
       return String(text || "")
@@ -1192,10 +1426,18 @@
       if (p.photo2) thumbBox.innerHTML += `<img src="${p.photo2}" onclick="document.getElementById('modalMainImg').src='${p.photo2}'" class="w-11 h-11 rounded-lg object-cover cursor-pointer border-2 border-slate-900 shadow">`;
 
       const viewerNorm = getCurrentViewerPhone();
+      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE);
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
       const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
+
+      // Chỉ mở SĐT/Zalo đầy đủ khi đồng thời có SĐT đã lưu AND đã giữ chỗ đôi này (hoặc chủ tin/admin)
+      const canUnlockContact = Boolean(
+        isAdmin ||
+        isSeller ||
+        (hasLoggedInPhone && isReserved && isCurrentBuyer)
+      );
 
       document.getElementById('modalCat').innerText = p.category;
       document.getElementById('modalTitle').innerText = p.title;
@@ -1203,7 +1445,7 @@
       document.getElementById('modalSize').innerText = p.size;
       document.getElementById('modalCond').innerText = p.condition;
       document.getElementById('modalLoc').innerText = p.location;
-      document.getElementById('modalSeller').innerText = (isSeller || isAdmin)
+      document.getElementById('modalSeller').innerText = canUnlockContact
         ? (p.sellerPhone || 'Chưa có SĐT')
         : maskPhoneNumber(p.sellerPhone);
       document.getElementById('modalNote').innerText = p.description ? `Ghi chú: ${p.description}` : 'Không có ghi chú thêm.';
@@ -1220,26 +1462,42 @@
         statusBadge.innerText = "Đang bán";
       }
 
+      const hintEl = document.getElementById('contactUnlockHint');
+      if (hintEl) {
+        if (canUnlockContact) {
+          hintEl.className = "text-[11px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-3 py-2";
+          hintEl.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> Đã mở liên hệ người bán. Vui lòng chốt giao dịch & chuyển 10% phí sàn về SHB <strong>7772345999</strong> khi bán thành công.`;
+        } else if (!hasLoggedInPhone) {
+          hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
+          hintEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1"></i> Số người bán đang ẩn. Nhập SĐT của bạn ở thanh trên và bấm <strong>Giữ Chỗ 90 Phút</strong> để hiện Gọi Điện / Zalo.`;
+        } else if (isReserved && !isCurrentBuyer) {
+          hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
+          hintEl.innerHTML = `<i class="fa-solid fa-hourglass-half mr-1"></i> Đôi này đang được khách khác giữ chỗ 90 phút. Liên hệ người bán tạm khóa để tránh gián đoạn kèo.`;
+        } else {
+          hintEl.className = "text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2";
+          hintEl.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Bạn đã lưu SĐT <strong>${viewerNorm}</strong>. Bấm <strong>Giữ Chỗ 90 Phút</strong> để mở SĐT và nút Gọi Điện / Zalo người bán.`;
+        }
+      }
+
       const callBtn = document.getElementById('btnCallSeller');
       const zaloBtn = document.getElementById('btnZaloSeller');
-      const canContactSeller = !isReserved || isCurrentBuyer || isSeller || isAdmin;
 
-      if (canContactSeller) {
-        callBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+      if (canUnlockContact) {
+        callBtn.classList.remove('opacity-45', 'cursor-not-allowed');
         callBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
         callBtn.innerHTML = `<i class="fa-solid fa-phone mr-1"></i> Gọi Điện`;
 
-        zaloBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        zaloBtn.classList.remove('opacity-45', 'cursor-not-allowed');
         zaloBtn.classList.add('bg-sky-600', 'hover:bg-sky-700');
         zaloBtn.innerHTML = `<i class="fa-solid fa-comment-dots mr-1"></i> Zalo`;
       } else {
-        callBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        callBtn.classList.add('opacity-45', 'cursor-not-allowed');
         callBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
-        callBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Đang giữ chỗ`;
+        callBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Gọi Điện`;
 
-        zaloBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        zaloBtn.classList.add('opacity-45', 'cursor-not-allowed');
         zaloBtn.classList.remove('bg-sky-600', 'hover:bg-sky-700');
-        zaloBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Tạm khóa`;
+        zaloBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Zalo`;
       }
 
       const timerBox = document.getElementById('modalTimerBox');
@@ -1273,14 +1531,21 @@
       if (!p) return;
 
       const viewerNorm = getCurrentViewerPhone();
+      const hasLoggedInPhone = Boolean(viewerNorm && viewerNorm !== ADMIN_CODE);
       const isAdmin = isAdminSession();
       const isSeller = Boolean(viewerNorm && !isAdmin && normalizePhone(p.sellerPhone) === viewerNorm);
       const isCurrentBuyer = Boolean(viewerNorm && normalizePhone(p.buyerPhone) === viewerNorm);
       const isReserved = p.status === 'negotiating';
 
-      if (isReserved && !isCurrentBuyer && !isSeller && !isAdmin) {
-        alert('Đôi giày này đang được khách khác giữ chỗ 90 phút. Tạm thời khóa gọi điện/Zalo người bán để tránh làm gián đoạn giao dịch.');
-        return;
+      if (!isAdmin && !isSeller) {
+        if (!hasLoggedInPhone) {
+          alert('Vui lòng nhập và lưu SĐT của bạn ở thanh trên cùng, sau đó bấm "Giữ Chỗ 90 Phút" để mở liên hệ người bán.');
+          return;
+        }
+        if (!isReserved || !isCurrentBuyer) {
+          alert('Bạn cần bấm "Giữ Chỗ 90 Phút" trên đôi giày này trước để hệ thống mở khóa SĐT / Zalo người bán.');
+          return;
+        }
       }
 
       if (!p.sellerPhone) {
@@ -1327,7 +1592,7 @@
 
       let buyerPhone = getCurrentViewerPhone();
       if (!buyerPhone || buyerPhone === ADMIN_CODE) {
-        const phone = prompt("Nhập SĐT của bạn để giữ chỗ 90 phút:");
+        const phone = prompt("Nhập SĐT của bạn để giữ chỗ 90 phút và mở liên hệ người bán:");
         if (!phone) return;
         const norm = normalizePhone(phone);
         if (!norm || norm === ADMIN_CODE) {
@@ -1370,7 +1635,7 @@
         price: p.price,
         productName: p.title
       });
-      alert(`Đã giữ chỗ 90 phút cho đôi: ${p.title}. Bạn vẫn có thể gọi điện / Zalo trực tiếp người bán để chốt kèo.`);
+      alert(`Đã giữ chỗ 90 phút & mở liên hệ người bán cho đôi: ${p.title}.`);
     }
 
     function confirmSoldAndCloseQR() {
@@ -1413,7 +1678,6 @@
         renderMarket();
         renderMyShoes();
 
-        // Bước 1: Gửi 'sold' trước và chờ Apps Script xử lý xong việc gửi mail xác nhận
         await postToCloud({
           action: 'UPDATE_STATUS',
           productId: targetId,
@@ -1424,7 +1688,6 @@
           price: price
         }, deleteAfterSold);
 
-        // Bước 2: Nếu chọn xóa luôn khỏi sàn, chờ 4 giây cho Apps Script gửi xong mail rồi mới gửi 'deleted'
         if (deleteAfterSold) {
           await new Promise(resolve => setTimeout(resolve, 4000));
           await postToCloud({
