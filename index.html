@@ -1404,12 +1404,23 @@
       await postToCloud({
         action: 'UPDATE_STATUS',
         productId: targetId,
-        newStatus: deleteAfterSold ? 'deleted' : 'sold',
+        newStatus: 'sold',
         buyerPhone: buyer
       });
 
+      if (deleteAfterSold) {
+        setTimeout(async () => {
+          await postToCloud({
+            action: 'UPDATE_STATUS',
+            productId: targetId,
+            newStatus: 'deleted',
+            buyerPhone: buyer
+          });
+        }, 1200);
+      }
+
       alert(deleteAfterSold
-        ? 'Đã xác nhận chốt bán và xóa tin khỏi sàn!'
+        ? 'Đã xác nhận chốt bán, gửi báo cáo về mail Admin và xóa tin khỏi sàn!'
         : 'Đã cập nhật trạng thái: Đã bán.');
     }
 
